@@ -1,0 +1,10 @@
+{
+    "callerInput": {
+        "file":"UMAutoAttendants(in).csv",
+        "columns": ["Name","BusinessHoursKeyMapping","AfterHoursKeyMapping", "PilotIdentifierList"]
+    },
+    "schedules": {
+        "file": "",
+        "columns": []
+    }
+}
