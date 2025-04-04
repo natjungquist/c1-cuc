@@ -1,10 +1,10 @@
-# TODO (WIP)
 # CUCConnector
 # class that makes API requests to CUC
 
 import zipfile
 import os
 import requests
+from AutoAttendant import AutoAttendant
 
 class CUCConnector:
 
@@ -13,9 +13,25 @@ class CUCConnector:
         self.username = username
         self.password = password
 
+    def create_handler(self, name):
+        pass
+    
+    # read the mappings from attendant and set them one by one??
+    # or this function sets one mapping at a time, but attendant provisioner iterates over the mappings and calls this function over and over?
+    def set_dtmf_mapping(self, attendant):
+        pass
+    
+    def set_business_hours(self, attendant):
+        pass
+    
+    def set_after_hours(self, attendant):
+        pass
+
+    # may need to be set for regular and after hours attendants???
     # WIP TESTING: does uploading an audio file work?
-    def upload_greeting(self, path, extract_dir, handler_id):
-        url = f"{self.server}/vmrest/handlers/callhandlers/{handler_id}/greetings/Alternate/greetingstreamfiles/1033/audio"
+    def upload_greeting(self, path, extract_dir, attendant:AutoAttendant):
+        id = attendant.get_id()
+        url = f"{self.server}/vmrest/handlers/callhandlers/{id}/greetings/Alternate/greetingstreamfiles/1033/audio"
         headers = {
             "Content-Type":"audio/wav",
             "Accept":"application/json",
