@@ -67,19 +67,18 @@ class CUCConnector:
         else:
             print(f"Failed to create call handler: {response.status_code} - {response.text}")
     
-    # read the mappings from handler and set them one by one??
-    # or this function sets one mapping at a time, but handler provisioner iterates over the mappings and calls this function over and over?
-    def set_dtmf_mapping(self, handler:CallHandler):
+    def set_dtmf_mapping(self, key, transfer_number, handler:CallHandler):
         pass
     
-    def set_business_hours(self, handler:CallHandler):
+    def set_transfer_rule(self, handler:CallHandler):
         pass
     
-    def set_after_hours(self, handler:CallHandler):
+    def set_pilot_identifier(self, handler:CallHandler):
         pass
 
-    # may need to be set for regular and after hours handlers???
-    # WIP TESTING: does uploading an audio file work?
+    def set_schedule(self, handler:CallHandler):
+        pass
+
     def upload_greeting(self, file_path, handler:CallHandler):
         id = handler.get_id()
         url = f"{self.server}/vmrest/handlers/callhandlers/{id}/greetings/Standard/greetingstreamfiles/1033/audio"
