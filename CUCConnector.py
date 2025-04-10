@@ -66,7 +66,6 @@ class CUCConnector:
             handler.UnityId = parts[-1]
         else:
             print(f"Failed to create call handler: {response.status_code} - {response.text}")
-
     
     # read the mappings from handler and set them one by one??
     # or this function sets one mapping at a time, but handler provisioner iterates over the mappings and calls this function over and over?
@@ -81,31 +80,24 @@ class CUCConnector:
 
     # may need to be set for regular and after hours handlers???
     # WIP TESTING: does uploading an audio file work?
-    def upload_greeting(self, path, extract_dir, handler:CallHandler):
+    def upload_greeting(self, file_path, handler:CallHandler):
         id = handler.get_id()
-        url = f"{self.server}/vmrest/handlers/callhandlers/{id}/greetings/Alternate/greetingstreamfiles/1033/audio"
+        url = f"{self.server}/vmrest/handlers/callhandlers/{id}/greetings/Standard/greetingstreamfiles/1033/audio"
         headers = {
             "Content-Type":"audio/wav",
             "Accept":"application/json",
         }
 
-        with zipfile.ZipFile(path, 'r') as zip_ref:
-            zip_ref.extractall(extract_dir)
+        with open(file_path, "rb") as wav:
+            response = requests.put(
+                url,
+                headers = headers,
+                auth = (self.username, self.password),
+                data = wav,
+                verify=False
+            )
 
-        for filename in os.listdir(extract_dir):
-            if filename.endswith(".wav"):
-                file_path = os.path.join(extract_dir, filename)
-
-            with open(file_path, "rb") as wav:
-                response = requests.put(
-                    url,
-                    headers = headers,
-                    auth = (self.username, self.password),
-                    data = wav,
-                    verify=False
-                )
-    
-            if response.status_code == 204:  # CUC API response has no content for this endpoint
-                print(f"Uploaded {filename} successfully")
-            else:
-                print(f"Failed to upload {filename}: {response.status_code} - {response.text}")
+        if response.status_code == 204:  # CUC API response has no content for this endpoint
+            print(f"Uploaded {file_path} successfully")
+        else:
+            print(f"Failed to upload {file_path}: {response.status_code} - {response.text}")
