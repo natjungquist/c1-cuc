@@ -1,38 +1,6 @@
 {
-  "server":"",
-  "username": "",
-  "password": "",
-    "callerInput": {
-        "file":"",
-        "columns": ["Name","BusinessHoursKeyMapping","AfterHoursKeyMapping"]
-    },
-    "autoAttendants":{
-      "file":"PRDD21EXCH01_UMAutoAttendants.csv",
-      "columns":["Id", "UMDialPlan", "OperatorExtension", 
-
-      "BusinessHoursTransferToOperatorEnabled",
-      "BusinessHoursMainMenuCustomPromptFilename", 
-      "BusinessHoursKeyMappingEnabled",
-      "BusinessHoursWelcomeGreetingFilename",
-
-      "AfterHoursTransferToOperatorEnabled",
-      "AfterHoursMainMenuCustomPromptFilename",
-      "AfterHoursKeyMappingEnabled",
-      "AfterHoursWelcomeGreetingFilename",
-      ""
-    ]
-    },
-    "schedules": {
-        "file": "",
-        "columns": []
-    },
-    "notes": ["AfterHoursKeyMappingEnabled TRUE means afterhourskeymapping non-null",         
-    "BusinessHoursKeyMappingEnabled TRUE means businesshourskeymapping non-null",
-
-    "AfterHoursWelcomeGreetingEnabled TRUE means AfterHoursWelcomeGreetingFilename non-null",
-    "BusinessHoursWelcomeGreetingEnabled TRUE means BusinessHoursWelcomeGreetingFilename non-null",
-
-    "BusinessHoursMainMenuCustomPromptEnabled TRUE means BusinessHoursMainMenuCustomPromptFilename non-null",
-    "AfterHoursMainMenuCustomPromptEnabled TRUE means AfterHoursMainMenuCustomPromptFilename non-null"
-  ]
+  "server":"10.0.0.64",
+  "username": "admin",
+  "password": "Cisc0L@b123!",
+  "autoAttendantsFile":"UMAA(Consolidated).csv"
 }
