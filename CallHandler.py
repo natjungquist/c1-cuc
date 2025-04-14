@@ -21,9 +21,13 @@ class CallHandler:
     # other
     self.UnityId = ""     # id in CUC
     self.prefix = self.Name[0:3]
+    self.transfer_rule_extension = ""
 
   def get_id(self):
     return self.UnityId
   
   def get_name(self):
     return self.Name
+  
+  def set_transfer_rule_extension(self, extension):
+    self.transfer_rule_extension = extension

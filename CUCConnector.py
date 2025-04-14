@@ -42,7 +42,7 @@ class CUCConnector:
         url = f"https://{self.server}/vmrest/handlers/callhandlers?templateObjectId={self.call_handler_template_id}"
 
         payload = json.dumps({
-            "DisplayName": handler.get_name()
+            "DisplayName": "test_transfer"
         })
         headers = {
             'Accept': 'application/json',
@@ -77,7 +77,7 @@ class CUCConnector:
         else:
             print(f"Failed to set dtmf: {response.status_code} - {response.text}")
     
-    def set_transfer_rule(self, extension, handler:CallHandler): #TODO
+    def set_transfer_rule(self, extension, handler:CallHandler):
         url = f"https://{self.server}/vmrest/handlers/callhandlers/{handler.get_id()}/transferoptions/Standard"
 
         payload = json.dumps({
@@ -88,7 +88,7 @@ class CUCConnector:
             # "TransferIntroduce": "true",
             # "TransferRings": "8",
             # "TransferScreening": "true",
-            "TransferType": "1",
+            "TransferType": "0",
             "Enabled": "true"
         })
         headers = {
@@ -104,12 +104,7 @@ class CUCConnector:
             print(f"Transfer rule set: {response.text}")
         else:
             print(f"Failed to set transfer rule: {response.status_code} - {response.text}")
-    
-    def set_pilot_identifier(self, handler:CallHandler):
-        pass
 
-    def set_schedule(self, handler:CallHandler):
-        pass
 
     def upload_greeting(self, file_path, handler:CallHandler): # TODO unsupported audio format error
         id = handler.get_id()
@@ -128,3 +123,10 @@ class CUCConnector:
             print(f"Uploaded {file_path} successfully")
         else:
             print(f"Failed to upload {file_path}: {response.status_code} - {response.text}")
+
+
+    def set_pilot_identifier(self, handler:CallHandler):
+        pass
+
+    def set_schedule(self, handler:CallHandler):
+        pass
