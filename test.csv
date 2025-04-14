@@ -1,0 +1,2 @@
+LOC#,Site,Name,PilotIdentifierList,OperatorExtension,BusinessHoursWelcomeGreetingFilename,BusinessHoursMainMenuCustomPromptFilename,BusinessHoursKeyMapping,BusinessHoursKeyMappingEnabled,AfterHoursWelcomeGreetingFilename,AfterHoursMainMenuCustomPromptFilename,AfterHoursKeyMapping,AfterHoursKeyMappingEnabled
+131, Green El,131-UMAA-01-Main_English,3000,3021,silence.wav,0131-UMAA-01-English-2023.wav,"1,Attendance and Enrollment,7000,,,,,,,; 2,Nurse,3050,,,,,,,; 9,Cesia,3022,,,,,,,; -,Operator,3021,,,,,,,",TRUE,silence.wav,0,0,FALSE
