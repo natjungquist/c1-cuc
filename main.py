@@ -1,12 +1,17 @@
 # TODO (WIP)
 # main
 
+# python -m pip install pandas
+# python -m pip install ffmpeg-python
+  # download ffmpeg exe. 7zip to Program Files\ffmpeg add to system path. 
 from CUCConnector import CUCConnector
 from CallHandler import CallHandler
 import pandas as pd
 import json
 import os
 import urllib3
+import ffmpeg
+import platform
 
 """
 finds the specific business hours wav file 
@@ -46,10 +51,29 @@ def set_business_hours_keys(handler:CallHandler):
         transfer_to = get_full_number(transfer_to, handler)
 
       if len(transfer_to) == 9:
+        if key == '-':
+          key = '0'
+          handler.set_transfer_rule_extension(transfer_to)
         print(f"key: {key} num: {transfer_to}")
         cn.set_dtmf_mapping(key, transfer_to, handler)
       else:
         print(f"error: failed to parse businses hours key mapping for handler {handler.Name}")
+
+"""
+converts the Microsoft ASF file to RIFF (little-endian) data, WAVE audio, Microsoft PCM, 16 bit, mono 8000 Hz
+"""
+def convert_to_wav(audio_file_path):
+  # print(platform.system())
+  output_path = os.getcwd() + f'\\audioFiles\\{audio_file_path}'
+  try:
+    (
+      ffmpeg
+      .input(audio_file_path)
+      .output(output_path, ar=8000, ac=1, sample_fmt='s16', format='wav', acodec='pcm_s16le')
+      .run(overwrite_output=True)
+    )
+  except ffmpeg.Error as e:
+    print("ffmpeg: " + e.stderr.decode())
 
 """
 main program execution.
@@ -85,14 +109,23 @@ if __name__ == "__main__":
   # set businss hours key mappings
   # set_business_hours_keys(test_handler)
 
-  # TODO:
   # set transfer rule
-  # TODO: why??
+  # cn.set_transfer_rule(test_handler.transfer_rule_extension, test_handler)
 
   # set business hours audio file greeting
-  audio_file_path = get_business_hours_audio_file_path(test_handler)
-  print(audio_file_path)
+  # audio_file_path = get_business_hours_audio_file_path(test_handler)
+  # convert_to_wav(audio_file_path)
   # cn.upload_greeting(audio_file_path, test_handler)
+
+  # TODO: test dtmf going to another handler
+  # TODO: confirm that - is only time to set transfer rule
+  # TODO: account for NULLS
+  # TODO: figure out which to create first
+  # TODO: after hours
+  # TODO: set schedules
+
+  
+
 
   # set after hours audio file greeting
   # if AfterHoursWelcomeGreetingFilename is not silence.wav, create another handler and set its audio?
