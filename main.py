@@ -6,6 +6,7 @@ from CallHandler import CallHandler
 import pandas as pd
 import json
 import os
+import urllib3
 
 """
 finds the specific business hours wav file 
@@ -43,12 +44,10 @@ def set_business_hours_keys(handler:CallHandler):
     else:
       if len(transfer_to) == 4: #only an extension was specified
         transfer_to = get_full_number(transfer_to, handler)
-      elif len(transfer_to) == 9: #a full 9 digit number was specified
-        pass
 
       if len(transfer_to) == 9:
         print(f"key: {key} num: {transfer_to}")
-        # cn.set_dtmf_mapping(key, transfer_to, handler)
+        cn.set_dtmf_mapping(key, transfer_to, handler)
       else:
         print(f"error: failed to parse businses hours key mapping for handler {handler.Name}")
 
@@ -56,6 +55,8 @@ def set_business_hours_keys(handler:CallHandler):
 main program execution.
 """
 if __name__ == "__main__":
+  urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
 
   # load in config items
   with open('config.json') as config_file:
@@ -66,8 +67,8 @@ if __name__ == "__main__":
   USERNAME = config["username"]
   PASSWORD = config["password"]
 
-  # cn = CUCConnector(SERVER, USERNAME, PASSWORD)
-  # cn.get_template_id()
+  cn = CUCConnector(SERVER, USERNAME, PASSWORD)
+  cn.get_template_id()
 
   df = pd.read_csv(FILE)
 
@@ -79,15 +80,19 @@ if __name__ == "__main__":
   #   get info, save to attendant object, save attendant dict
 
   # create the handlers
-  # cn.creat_handler_and_get_id(test_handler)
+  cn.create_handler_and_get_id(test_handler)
 
   # set businss hours key mappings
   # set_business_hours_keys(test_handler)
 
+  # TODO:
+  # set transfer rule
+  # TODO: why??
+
   # set business hours audio file greeting
   audio_file_path = get_business_hours_audio_file_path(test_handler)
   print(audio_file_path)
-  # cn.upload_greeting(audio_file_path, handler)
+  # cn.upload_greeting(audio_file_path, test_handler)
 
   # set after hours audio file greeting
   # if AfterHoursWelcomeGreetingFilename is not silence.wav, create another handler and set its audio?
