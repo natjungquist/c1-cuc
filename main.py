@@ -120,6 +120,7 @@ if __name__ == "__main__":
   # TODO: test dtmf going to another handler
   # TODO: confirm that - is only time to set transfer rule
   # TODO: account for NULLS
+  # TODO: set pilot identifier
   # TODO: figure out which to create first
   # TODO: after hours
   # TODO: set schedules
