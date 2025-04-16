@@ -257,3 +257,4 @@ $RECYCLE.BIN/
 config.json
 
 audioFiles/
+converted_wav_files/

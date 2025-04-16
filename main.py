@@ -37,68 +37,75 @@ def get_full_number(extension, handler:CallHandler):
 sets all mappings for one call handler.
 """
 def set_business_hours_keys_and_transfer_rules(handler:CallHandler, cn:CUCConnector): # TODO all_handers
-  if handler.BusinessHoursKeyMapping == "0" or not handler.BusinessHoursKeyMapping:
+  if handler.BusinessHoursKeyMapping == "0" or not handler.BusinessHoursKeyMapping or handler.BusinessHoursKeyMapping == 0 or handler.BusinessHoursKeyMapping == "nan":
     with open("handlers_with_0_dtmf.txt", "a") as file:
       file.write(f"{handler.Name}\n")
       return
+
+  try: 
+    mapping_list = handler.BusinessHoursKeyMapping.split(';')
+    for mapping in mapping_list:
+      mapping_parts = mapping.split(',')
+
+      transfer_to = None
+      key = mapping_parts[0].strip()
       
-  mapping_list = handler.BusinessHoursKeyMapping.split(';')
-  for mapping in mapping_list:
-    mapping_parts = mapping.split(',')
+      # if (mapping_parts[2] != ''): # go to a number
+      #   transfer_to = mapping_parts[2]
 
-    transfer_to = None
-    key = mapping_parts[0].strip()
-    
-    # if (mapping_parts[2] != ''): # go to a number
-    #   transfer_to = mapping_parts[2]
+      #   if len(transfer_to) == 4: #only an extension was specified
+      #     transfer_to = get_full_number(transfer_to, handler)
 
-    #   if len(transfer_to) == 4: #only an extension was specified
-    #     transfer_to = get_full_number(transfer_to, handler)
+      #   if len(transfer_to) == 9: #must be 9 digits long to proceed
+      #     if key == '-': #dash from customer data represents the operator
+      #       key = '0'
+      #       handler.set_transfer_rule_extension(transfer_to)
+      #       cn.set_transfer_rule(handler)
 
-    #   if len(transfer_to) == 9: #must be 9 digits long to proceed
-    #     if key == '-': #dash from customer data represents the operator
-    #       key = '0'
-    #       handler.set_transfer_rule_extension(transfer_to)
-    #       cn.set_transfer_rule(handler)
+      #     print(f"key: {key} num: {transfer_to}")
+      #     cn.set_dtmf_mapping(key, transfer_to, handler, is_to_number=True)
+      #   else:
+      #     print(f"error: failed to parse businses hours key mapping for handler {handler.Name}\n")
 
-    #     print(f"key: {key} num: {transfer_to}")
-    #     cn.set_dtmf_mapping(key, transfer_to, handler, is_to_number=True)
-    #   else:
-    #     print(f"error: failed to parse businses hours key mapping for handler {handler.Name}\n")
+      # elif (mapping_parts[3] != ''): # go to a another handler
+      #   transfer_to = mapping_parts[3]
 
-    # elif (mapping_parts[3] != ''): # go to a another handler
-    #   transfer_to = mapping_parts[3]
+      #   handler_next = all_handlers.get(transfer_to.get_name())
+      #   if handler_next:
+      #     transfer_to = handler_next.get_id()
+      #     print(f"key: {key} handler id: {transfer_to}")
 
-    #   handler_next = all_handlers.get(transfer_to.get_name())
-    #   if handler_next:
-    #     transfer_to = handler_next.get_id()
-    #     print(f"key: {key} handler id: {transfer_to}")
+      #   if not transfer_to:
+      #     print(f"error getting id of handler to transfer to\n")
+      #   else:
+      #     cn.set_dtmf_mapping(key, transfer_to, handler, is_to_number=False)
 
-    #   if not transfer_to:
-    #     print(f"error getting id of handler to transfer to\n")
-    #   else:
-    #     cn.set_dtmf_mapping(key, transfer_to, handler, is_to_number=False)
+      try:
+        if (mapping_parts[4] != ''): # go to a wav file
+          transfer_to = mapping_parts[4]
 
-    try:
-      if (mapping_parts[4] != ''): # go to a wav file
-        transfer_to = mapping_parts[4]
-
-        # check if wav file exists
-        audio_file_path = get_audio_file_path(transfer_to, PATH_TO_AUDIO_FILES)
-        if not audio_file_path:
-            with open("missing_wav_files.txt", "a") as file:
-              file.write(f"{transfer_to}\n")
-        else:
-            with open("found_wav_files.txt", "a") as file:
-              file.write(f"{transfer_to}\n")
-    except IndexError:
-       with open("index_error.txt", "a") as file:
-        file.write(handler.BusinessHoursKeyMapping)
-        file.write(mapping)
-        print(mapping_parts)
-        file.write(f"{handler.Name}\n")
-        file.write("\n")
-        return
+          # check if wav file exists
+          audio_file_path = get_audio_file_path(transfer_to, PATH_TO_AUDIO_FILES)
+          if not audio_file_path:
+              with open("missing_wav_files.txt", "a") as file:
+                file.write(f"{transfer_to}\n")
+          else:
+              with open("found_wav_files.txt", "a") as file:
+                file.write(f"{transfer_to}\n")
+      except IndexError:
+        with open("index_error.txt", "a") as file:
+          file.write(handler.BusinessHoursKeyMapping)
+          file.write(mapping)
+          print(mapping_parts)
+          file.write(f"{handler.Name}\n")
+          file.write("\n")
+          return
+        
+  except AttributeError:
+     print(handler.Name)
+     print(handler.BusinessHoursKeyMapping)
+     return 
+  
       
 
 
@@ -201,14 +208,20 @@ if __name__ == "__main__":
   for index, row in df.iterrows():
       test_handler = CallHandler(row)
       set_business_hours_keys_and_transfer_rules(test_handler, cn)
-      target_filename = test_handler.BusinessHoursMainMenuCustomPromptFilename.lower()
-      audio_file_path = get_audio_file_path(target_filename, PATH_TO_AUDIO_FILES)
-      if not audio_file_path:
-        with open("missing_wav_files.txt", "a") as file:
-          file.write(f"{target_filename}\n")
-      else:
-        with open("found_wav_files.txt", "a") as file:
-          file.write(f"{target_filename}\n")
+      try:
+        target_filename = test_handler.BusinessHoursMainMenuCustomPromptFilename.lower()
+        audio_file_path = get_audio_file_path(target_filename, PATH_TO_AUDIO_FILES)
+        if not audio_file_path:
+          with open("missing_wav_files.txt", "a") as file:
+            file.write(f"{target_filename}\n")
+        else:
+          with open("found_wav_files.txt", "a") as file:
+            file.write(f"{target_filename}\n")
+      except AttributeError:
+        print('attribute error')
+        print(test_handler.Name)
+        
+      
 
   # data = df.iloc[0]
   # test_handler = CallHandler(data)
