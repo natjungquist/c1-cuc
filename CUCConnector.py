@@ -76,6 +76,13 @@ class CUCConnector:
     transfer_to must be:
     (1) a string of digits representing a phone number or 
     (2) a string representing another existing handler's id.
+
+    the Cisco Unity Connection (CUC) API cannot set a DTMF menu entry (i.e., key press in a call handler greeting) to play a specific WAV file directly. DTMF entries can only route to:
+    - Users
+    - Call handlers
+    - Directory handlers
+    - Interview handlers
+
     """
     def set_dtmf_mapping(self, key, transfer_to, handler:CallHandler, is_to_number):
         url = f"https://{self.server}/vmrest/handlers/callhandlers/{handler.get_id()}/menuentries/{key}"
