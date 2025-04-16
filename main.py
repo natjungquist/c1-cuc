@@ -37,11 +37,11 @@ def get_full_number(extension, handler:CallHandler):
 sets all mappings for one call handler.
 """
 def set_business_hours_keys_and_transfer_rules(handler:CallHandler, cn:CUCConnector): # TODO all_handers
-  if handler.BusinessHoursKeyMapping == "0":
-    with open("handlers_with_no_dtmf.txt", "a") as file:
+  if handler.BusinessHoursKeyMapping == "0" or not handler.BusinessHoursKeyMapping:
+    with open("handlers_with_0_dtmf.txt", "a") as file:
       file.write(f"{handler.Name}\n")
       return
-     
+      
   mapping_list = handler.BusinessHoursKeyMapping.split(';')
   for mapping in mapping_list:
     mapping_parts = mapping.split(',')
@@ -93,7 +93,11 @@ def set_business_hours_keys_and_transfer_rules(handler:CallHandler, cn:CUCConnec
               file.write(f"{transfer_to}\n")
     except IndexError:
        with open("index_error.txt", "a") as file:
+        file.write(handler.BusinessHoursKeyMapping)
+        file.write(mapping)
+        print(mapping_parts)
         file.write(f"{handler.Name}\n")
+        file.write("\n")
         return
       
 
@@ -243,6 +247,8 @@ if __name__ == "__main__":
 
   # TODO: set pilot identifier
   # cn.set_dmf_access_id(test_handler)
+
+  # TODO sometimes there is an operatorextension but the - operator in the key mapping is different
 
   
 
