@@ -44,6 +44,9 @@ def set_business_hours_keys_and_transfer_rules(handler:CallHandler, cn:CUCConnec
 
     key = mapping_parts[0].strip()
     transfer_to = mapping_parts[2]
+    # TODO: if it ends in .wav it does not ref another handler ,,, need to look for that in the wav files
+    # when it is ,, it is another handler
+    # TODO: sometimes there is an x in front of the extension
 
     if len(transfer_to) > 9: #it is going to another call handler
       handler_next = all_handlers.get(transfer_to.get_name())
@@ -103,60 +106,45 @@ def convert_all_wav_files(source_dir):
           convert_to_wav(input_path, output_path)
 
 """
-creates new csv file sorted by name of call handler that needs to be created first
+finds some handlers that have business hours key mappings that reference other handlers
 """
-def prioritize_handler_csv(FILE):
-    df_original = pd.read_csv(FILE)
-    df = topological_sort_handlers(df_original)
-    df.to_csv("UMAA.csv", index=False)
+def extract_referenced_handlers(df: pd.DataFrame) -> pd.DataFrame:
+    referenced_handlers = set()
 
+    handler_pattern = re.compile(r"\d{3}-UMAA-[\w\-]+(?!\.wav(?:$|\s))")
 
-"""
-finds all handlers that have business hours key mappings that reference other handlers
-"""
-def topological_sort_handlers(df: pd.DataFrame) -> pd.DataFrame:
-    handler_pattern = re.compile(r"\d{3}-UMAA-[\w\-]+")
-    name_to_deps = defaultdict(set)
-    all_names = set(df["Name"].dropna())
+    # Step 1: Check each row for referenced handler names
+    for mapping in df["BusinessHoursKeyMapping"].dropna():
+        matches = handler_pattern.findall(mapping)
+        referenced_handlers.update(matches)
 
-    # Build graph of dependencies: A → B if A references B
-    for _, row in df.iterrows():
-        name = row["Name"]
-        mappings = row.get("BusinessHoursKeyMapping", "")
-        if pd.notna(mappings):
-            referenced = set(handler_pattern.findall(mappings))
-            for ref in referenced:
-                if ref != name and ref in all_names:
-                    name_to_deps[name].add(ref)
+    # Normalize the referenced handlers (e.g., lowercase) to avoid case mismatch issues
+    referenced_handlers = {name.lower() for name in referenced_handlers}
 
-    # Invert graph: for each handler, track who depends on it
-    in_degree = defaultdict(int)
-    graph = defaultdict(list)
-    for src, targets in name_to_deps.items():
-        for tgt in targets:
-            graph[tgt].append(src)
-            in_degree[src] += 1
+    # Step 2: Ensure the 'Name' column is also normalized to lowercase for comparison
+    df["Name"] = df["Name"].str.strip().str.lower()
 
-    # Queue of nodes with no dependencies
-    queue = deque([name for name in df["Name"] if in_degree[name] == 0])
-    ordered_names = []
+    # Step 3: Create a new DataFrame that only includes handlers that are referenced
+    df_referenced = df[df["Name"].isin(referenced_handlers)]
 
-    while queue:
-        current = queue.popleft()
-        ordered_names.append(current)
-        for dependent in graph[current]:
-            in_degree[dependent] -= 1
-            if in_degree[dependent] == 0:
-                queue.append(dependent)
+    missing_handlers = referenced_handlers - set(df["Name"])
 
-    # Catch cycles or handlers not listed
-    unordered_names = [name for name in df["Name"] if name not in ordered_names]
-    ordered_names.extend(unordered_names)  # Append unresolved ones at the end
+    # Step 5: Save the missing handlers to a separate file
+    output_file = "test_2.txt"
+    if missing_handlers:
+        missing_handlers_df = pd.DataFrame(list(missing_handlers), columns=["wav file"])
+        missing_handlers_df.to_csv(output_file, index=False)
+        print(f"wav file references saved to {output_file}")
 
-    # Sort the dataframe based on computed order
-    df["__sort_index__"] = df["Name"].apply(lambda x: ordered_names.index(x) if x in ordered_names else float("inf"))
-    df_sorted = df.sort_values("__sort_index__").drop(columns="__sort_index__")
-    return df_sorted
+    # Optional: print or log the referenced handler names
+    print(f"Number of referenced handlers or wav files: {len(referenced_handlers)}")
+    print(f"Number of referenced handlers found in df: {len(df_referenced)}")
+    print("Referenced handler names found in BusinessHoursKeyMapping:")
+    for name in referenced_handlers:
+        print(name)
+
+    # Return the DataFrame with only referenced handlers
+    return df_referenced
 
 
 """
@@ -178,7 +166,6 @@ if __name__ == "__main__":
   USERNAME = config["username"]
   PASSWORD = config["password"]
 
-  prioritize_handler_csv(FILE)
 
   # data = df.iloc[0]
   # test_handler = CallHandler(data)
