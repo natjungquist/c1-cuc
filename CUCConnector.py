@@ -90,7 +90,7 @@ class CUCConnector:
         if is_to_number:
           payload = f"<MenuEntry>\r\n    <Action>7</Action>\r\n    <TransferNumber>{transfer_to}</TransferNumber>\r\n</MenuEntry>"
         else:
-          payload = f"<MenuEntry>\r\n    <Action>2</Action>\r\n    <TargetHandlerObjectId>{transfer_to}</TargetHandlerObjectId>\r\n</MenuEntry>"
+          payload = f"<MenuEntry>\r\n<Action>2</Action>\r\n<TargetConversation>PHTransfer</TargetConversation>\r\n<TargetHandlerObjectId>{transfer_to}</TargetHandlerObjectId>\r\n</MenuEntry>"
 
         headers = {
             'Accept': 'application/xml',
@@ -115,11 +115,6 @@ class CUCConnector:
         payload = json.dumps({
             "Action": "1",
             "Extension": handler.transfer_rule_extension,
-            # "TransferAnnounce": "true",
-            # "TransferConfirm": "true", 
-            # "TransferIntroduce": "true",
-            # "TransferRings": "8",
-            # "TransferScreening": "true",
             "TransferType": "0",
             "Enabled": "true"
         })
