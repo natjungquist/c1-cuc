@@ -158,8 +158,6 @@ if __name__ == "__main__":
     print(f"{num_missing_wavs} audio files not found for setting business hours menu prompt.")
   
 
-  # TODO: test dtmf going to another handler
-
   # TODO: account for NULLS
 
   # TODO: after hours
