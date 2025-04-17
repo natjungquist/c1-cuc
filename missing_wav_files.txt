@@ -1,4 +1,3 @@
-0
 089-UMAA-07-School-Information-2021.wav
 322-umaa-02-spanish_main_16bit_mono.wav
 091-umaa-02-spanish_main_16bit_mono.wav
@@ -9,13 +8,10 @@
 329-umaa-02-spanish_main_16bit_mono.wav
 055-UMMA-09-School-Info-English-2021.wav
 055-UMAA-09-School-Info-Spanish-2021.wav
-0
 023-umaa-02-spanish_main_16bit_mono.wav
-0
 367-farb-counselors-english.wav
 223-UMAA-06-School-Information-2025.wav
 361-umaa-01-english_main_16bit_mono.wav
-0
 009-umaa-02-spanish_main_16bit_mono.wav
 322-umaa-02-spanish_main_16bit_mono.wav
 329-umaa-01-main-spanish-2020.wav
@@ -25,7 +21,6 @@
 074-umaa-01-spanish_main_16bit_mono.wav
 093-umaa-02-spanish_main_16bit_mono.wav
 093-UMMA-MAIN-DAY-SPANISH-08142018.wav
-0
 362-twain-main menu-spanish.wav
 329-umaa-02-spanish_main_16bit_mono.wav
 322-umaa-01-english_main_16bit_mono.wav
@@ -54,138 +49,67 @@
 302-umaa-dept-english-01_1-20-15.wav
 302-umaa-admin_1-20-15.wav
 302-umaa-6th7th8th_01-20-15.wav
-0
 326-Taft-Main-03.wav
 302-umaa-a-l_m-z_1-20-15.wav
 302-umaa-a-l_m-z_1-20-15.wav
-0
-0
 thanksgiving holiday ed ctr.wav
 992_annex12_spanish.wav
 338-umaa-03.1-attend_english_night.wav
 338-umaa-04.1-attend_spanish_night.wav
-0
-0
 302_viceprin5_english.wav
 302_offices_english3.wav
 302_viceprin_spanish.wav
 302_offices_spanish.wav
 302_coun_spanish.wav
-0
-0
 041_spinash_day_01.wav
 041_spinash_night_02.wav
 041-UMAA-09-School-Information-English-2022.wav
 041_english_night_02.wav
-0
-0
 thanksgiving holiday ed ctr.wav
 215-UMAA-02-School-Information-English-2022.wav
 215-UMAA-02-School-Information-Spanish-2022.wav
-0
-0
 149-UMAA-School Spanish-2022.wav
 149-UMAA-School-English-2022.wav
 344-umaa-09-school.hours-spanish-2019.wav
 344-umaa-09-school.hours-english.wav
-0
 344-UMAA-05-School-Information-2024.wav
-0
 344-UMAA-09-School-Hours-Spanish-2022.wav
 Directions Main English.wav
 Recruitement 11-15-2021.wav
 Credentials Srvs 9-15-2022.wav
 Salary Placement 9-15-22.wav
 Leaves of Absense 9-15-22.wav
-0
-0
-0
 roosevelt_ms_counselor.wav
 324-UMAA-09-Information-English-2024.wav
 counselor greeting spanish.wav
 365-UMAA-02-Schoolhours_ English.wav
 365-UMAA-02-Schoolhours_ Spanish.wav
 916198180040 (18 seconds) voice mail-02.wav
-0
 _options-spanish.wav
-0
-0
-0
-0
 Chall-Absenceonly.wav
-0
-0
-0
 spanish main.wav
-0
 PtLoma-Main-English-9-5.wav
 PointLoma-SpanishMain.wav
 pointloma-spanishmain.wav
 network services datacomm menu.wav
 network services main greeting.wav
 332-umaa-09-admin-spanish-2021.wav
-0
-0
 111-School-Info.wav
-0
-0
-0
-0
 Standley-Absence-Report.wav
 329-umaa-02-counselor-spanish-2020.wav
 329-umaa-06-parent-english.wav
 329-umaa-06-parent-spanish.wav
-0
-0
-0
-0
-0
 sub sub menu spanish.wav
-0
-0
-0
-0
-0
 808submenu1.wav
 808main2.wav
-0
-0
-0
-0
-0
-0
-0
-0
-0
 156-UMAA-07-Information-English-2024.wav
-0
-0
-0
 179LomaPortalInfo.wav
-0
 179PortInfo.wav
-0
-0
-0
-0
-0
-0
-0
 808submenu1.wav
 808main2.wav
-0
-0
-0
-0
-0
 181-School-Info.wav
-0
-0
-0
-0
 199-umaa-01-main-spanish-2021.wav
 313-umaa-02-summer-spanish-2022.wav
-0
 362-umaa-summer-english-2021.wav
 302-umaa-summer-english-21.wav
 320-umaa-summer-english-spanish-2021.wav
@@ -193,14 +117,9 @@ sub sub menu spanish.wav
 279-UMAA-06-School-Information-English.wav
 263-umaa-01-winter-spanish-2021.wav
 003-umaa-summer-english-spanish-2022.wav
-0
 274-umaa-summer-english-2022.wav
-0
 344-umaa-temp-greeting.wav
 lmec language selection.wav
-0
-0
-0
 sdusd transportation school site direct line.wav
 sdusd transportation absence line.wav
 Sequoia Winter break 2023.wav

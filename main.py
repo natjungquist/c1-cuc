@@ -14,8 +14,6 @@ import platform
 import re
 from collections import defaultdict, deque
 
-PATH_TO_AUDIO_FILES = os.path.join(os.getcwd(), "audioFiles") # TODO converted_audio_files
-
 """
 finds the specific business hours wav file 
 from the directory with all the wav files.
@@ -37,76 +35,56 @@ def get_full_number(extension, handler:CallHandler):
 sets all mappings for one call handler.
 """
 def set_business_hours_keys_and_transfer_rules(handler:CallHandler, cn:CUCConnector): # TODO all_handers
-  if handler.BusinessHoursKeyMapping == "0" or not handler.BusinessHoursKeyMapping or handler.BusinessHoursKeyMapping == 0 or handler.BusinessHoursKeyMapping == "nan":
-    with open("handlers_with_0_dtmf.txt", "a") as file:
-      file.write(f"{handler.Name}\n")
-      return
 
-  try: 
-    mapping_list = handler.BusinessHoursKeyMapping.split(';')
-    for mapping in mapping_list:
-      mapping_parts = mapping.split(',')
+  mapping_list = handler.BusinessHoursKeyMapping.split(';')
+  for mapping in mapping_list:
+    mapping_parts = mapping.split(',')
 
-      transfer_to = None
-      key = mapping_parts[0].strip()
-      
-      # if (mapping_parts[2] != ''): # go to a number
-      #   transfer_to = mapping_parts[2]
+    transfer_to = None
+    key = mapping_parts[0].strip()
+    
+    # if (mapping_parts[2] != ''): # go to a number
+    #   transfer_to = mapping_parts[2]
 
-      #   if len(transfer_to) == 4: #only an extension was specified
-      #     transfer_to = get_full_number(transfer_to, handler)
+    #   if len(transfer_to) == 4: #only an extension was specified
+    #     transfer_to = get_full_number(transfer_to, handler)
 
-      #   if len(transfer_to) == 9: #must be 9 digits long to proceed
-      #     if key == '-': #dash from customer data represents the operator
-      #       key = '0'
-      #       handler.set_transfer_rule_extension(transfer_to)
-      #       cn.set_transfer_rule(handler)
+    #   if len(transfer_to) == 9: #must be 9 digits long to proceed
+    #     if key == '-': #dash from customer data represents the operator
+    #       key = '0'
+    #       handler.set_transfer_rule_extension(transfer_to)
+    #       cn.set_transfer_rule(handler)
 
-      #     print(f"key: {key} num: {transfer_to}")
-      #     cn.set_dtmf_mapping(key, transfer_to, handler, is_to_number=True)
-      #   else:
-      #     print(f"error: failed to parse businses hours key mapping for handler {handler.Name}\n")
+    #     print(f"key: {key} num: {transfer_to}")
+    #     cn.set_dtmf_mapping(key, transfer_to, handler, is_to_number=True)
+    #   else:
+    #     print(f"error: failed to parse businses hours key mapping for handler {handler.Name}\n")
 
-      # elif (mapping_parts[3] != ''): # go to a another handler
-      #   transfer_to = mapping_parts[3]
+    # elif (mapping_parts[3] != ''): # go to a another handler
+    #   transfer_to = mapping_parts[3]
 
-      #   handler_next = all_handlers.get(transfer_to.get_name())
-      #   if handler_next:
-      #     transfer_to = handler_next.get_id()
-      #     print(f"key: {key} handler id: {transfer_to}")
+    #   handler_next = all_handlers.get(transfer_to.get_name())
+    #   if handler_next:
+    #     transfer_to = handler_next.get_id()
+    #     print(f"key: {key} handler id: {transfer_to}")
 
-      #   if not transfer_to:
-      #     print(f"error getting id of handler to transfer to\n")
-      #   else:
-      #     cn.set_dtmf_mapping(key, transfer_to, handler, is_to_number=False)
+    #   if not transfer_to:
+    #     print(f"error getting id of handler to transfer to\n")
+    #   else:
+    #     cn.set_dtmf_mapping(key, transfer_to, handler, is_to_number=False)
 
-      try:
-        if (mapping_parts[4] != ''): # go to a wav file
-          transfer_to = mapping_parts[4]
+    if (mapping_parts[4] != ''): # go to a wav file
+      transfer_to = mapping_parts[4]
 
-          # check if wav file exists
-          audio_file_path = get_audio_file_path(transfer_to, PATH_TO_AUDIO_FILES)
-          if not audio_file_path:
-              with open("missing_wav_files.txt", "a") as file:
-                file.write(f"{transfer_to}\n")
-          else:
-              with open("found_wav_files.txt", "a") as file:
-                file.write(f"{transfer_to}\n")
-      except IndexError:
-        with open("index_error.txt", "a") as file:
-          file.write(handler.BusinessHoursKeyMapping)
-          file.write(mapping)
-          print(mapping_parts)
-          file.write(f"{handler.Name}\n")
-          file.write("\n")
-          return
-        
-  except AttributeError:
-     print(handler.Name)
-     print(handler.BusinessHoursKeyMapping)
-     return 
+      # check if wav file exists
+      audio_file_path = get_audio_file_path(transfer_to, PATH_TO_AUDIO_FILES)
+      if not audio_file_path:
+          with open("missing_wavs_for_businesshours_dtmf.txt", "a") as file:
+            file.write(f"{transfer_to}\n")
+      with open("dtmf_could_not_be_set_to_wav.txt", "a") as file:
+        file.write(f"{handler.Name}: {transfer_to}\n")
+
   
-      
 
 
 """
@@ -198,73 +176,67 @@ if __name__ == "__main__":
     config = json.load(config_file)
 
   FILE = config["autoAttendantsFile"]
+  PATH_TO_AUDIO_FILES = os.path.join(os.getcwd(), "converted_audio_files") 
 
   SERVER = config["server"]
   USERNAME = config["username"]
   PASSWORD = config["password"]
   cn = CUCConnector(SERVER, USERNAME, PASSWORD)
-
-  df = pd.read_csv(FILE)
-  for index, row in df.iterrows():
-      test_handler = CallHandler(row)
-      set_business_hours_keys_and_transfer_rules(test_handler, cn)
-      try:
-        target_filename = test_handler.BusinessHoursMainMenuCustomPromptFilename.lower()
-        audio_file_path = get_audio_file_path(target_filename, PATH_TO_AUDIO_FILES)
-        if not audio_file_path:
-          with open("missing_wav_files.txt", "a") as file:
-            file.write(f"{target_filename}\n")
-        else:
-          with open("found_wav_files.txt", "a") as file:
-            file.write(f"{target_filename}\n")
-      except AttributeError:
-        print('attribute error')
-        print(test_handler.Name)
-        
-      
-
-  # data = df.iloc[0]
-  # test_handler = CallHandler(data)
-  # print(data)
-
-
-  
   # cn.get_template_id()
 
   # set info for all handlers
-  # call_handlers = {}
+  call_handlers = {} #key: name, value:handler
+
+  df = pd.read_csv(FILE)
+
+  for index, row in df.iterrows():
+    handler = CallHandler(row)
+    if handler.BusinessHoursKeyMappingEnabled:
+      set_business_hours_keys_and_transfer_rules(handler, cn)
+
+  # print("creating handlers...")
+  # for index, row in df.iterrows():
+  #     handler = CallHandler(row)
+  #     cn.create_handler_and_get_id(handler)
+  #     call_handlers[handler.Name] = handler
+  
+  # print("setting business hours key mappings...")
+  # print("setting transfer rules...")
+  # print("uploading greetings...")
+  # print("setting access numbers...")
+  # for handler in call_handlers.values():
+  #   # set businss hours key mappings and transfer rules
+  #   if handler.BusinessHoursKeyMappingEnabled:
+  #     set_business_hours_keys_and_transfer_rules(handler, cn)
+
+  #   # set business hours audio file greeting
+  #   if handler.BusinessHoursMainMenuCustomPromptFilename and handler.BusinessHoursMainMenuCustomPromptFilename != "0" and handler.BusinessHoursMainMenuCustomPromptFilename != 0:
+  #     target_filename = handler.BusinessHoursMainMenuCustomPromptFilename.lower()
+  #     audio_file_path = get_audio_file_path(target_filename, PATH_TO_AUDIO_FILES)
+
+  #     num_missing_wavs = 0
+  #     if audio_file_path:
+  #       cn.upload_greeting(audio_file_path, handler)
+  #     else:
+  #       num_missing_wavs += 1
+  #       print(f"audio file {audio_file_path} not found\n")
+
+  #   # set access extension
+  #   if handler.PilotIdentifierList and handler.PilotIdentifierList != "0" and handler.PilotIdentifierList != 0:
+  #     cn.set_dmf_access_id(handler)
+
+  # print(f"{num_missing_wavs} audio files not found for setting business hours menu prompt.")
   
 
-  # create the handlers
-  # cn.create_handler_and_get_id(test_handler)
-
-  # set businss hours key mappings and transfer rules
-  # set_business_hours_keys_and_transfer_rules(test_handler, cn)
   # TODO: test dtmf going to another handler
   # TODO: account for NULLS
-
-  # # set business hours audio file greeting
-  # target_filename = test_handler.BusinessHoursMainMenuCustomPromptFilename.lower()
-  # audio_file_path = get_audio_file_path(target_filename, path_to_audio_files)
-  # if not audio_file_path:
-  #   with open("missing_wav_files.txt", "a") as file:
-  #     file.write(f"{target_filename}\n")
-  # else:
-  #   with open("found_wav_files.txt", "a") as file:
-  #     file.write(f"{target_filename}\n")
-  
-  # cn.upload_greeting(audio_file_path, test_handler)
 
   # TODO: after hours
   # TODO: set schedules
 
-  # TODO: set pilot identifier
-  # cn.set_dmf_access_id(test_handler)
 
   # TODO sometimes there is an operatorextension but the - operator in the key mapping is different
-
-  
-
+  # TODO sometimes keymapping is false but there is a key mapping
 
   # set after hours audio file greeting
   # if AfterHoursWelcomeGreetingFilename is not silence.wav, create another handler and set its audio?

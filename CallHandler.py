@@ -12,11 +12,11 @@ class CallHandler:
     self.BusinessHoursWelcomeGreetingFilename = data['BusinessHoursWelcomeGreetingFilename']
     self.BusinessHoursMainMenuCustomPromptFilename = data['BusinessHoursMainMenuCustomPromptFilename']
     self.BusinessHoursKeyMapping = data['BusinessHoursKeyMapping']                  
-    self.BusinessHoursKeyMappingEnabled = True if data['BusinessHoursKeyMappingEnabled'] == 'TRUE' else False        
+    self.BusinessHoursKeyMappingEnabled = True if data['BusinessHoursKeyMappingEnabled'] else False        
     self.AfterHoursWelcomeGreetingFilename = data['AfterHoursWelcomeGreetingFilename']       
     self.AfterHoursMainMenuCustomPromptFilename = data['AfterHoursMainMenuCustomPromptFilename']
     self.AfterHoursKeyMapping = data['AfterHoursKeyMapping']                         
-    self.AfterHoursKeyMappingEnabled = True if data['AfterHoursKeyMappingEnabled'] == 'TRUE' else False
+    self.AfterHoursKeyMappingEnabled = True if data['AfterHoursKeyMappingEnabled'] else False
 
     # other
     self.UnityId = ""     # id in CUC
