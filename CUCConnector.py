@@ -166,7 +166,7 @@ class CUCConnector:
     """
     def set_dmf_access_id(self, handler:CallHandler):
         url = f"https://{self.server}/vmrest/handlers/callhandlers/{handler.get_id()}/"
-        payload = f"<CallHandler>\r\n    <DTMFAccessId>{handler.PilotIdentifierList[0]}</DTMFAccessId>\r\n    </CallHander>"
+        payload = f"<CallHandler>\r\n    <DTMFAccessId>{handler.PilotIdentifierList}</DTMFAccessId>\r\n    </CallHander>"
         headers = {
             'Accept': 'application/xml',
             'Content-Type': 'application/xml'
@@ -177,7 +177,7 @@ class CUCConnector:
         )
 
         if response.status_code == 204: 
-            print(f"Call handler {handler.get_name()} DTMFAccessId set with {handler.PilotIdentifierList[0]}\n")
+            print(f"Call handler {handler.get_name()} DTMFAccessId set with {handler.PilotIdentifierList}\n")
         else:
             print(f"Failed to set DTMFAccessId for {handler.get_name()}: {response.status_code} - {response.text}\n")
     
