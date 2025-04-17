@@ -54,7 +54,7 @@ class CUCConnector:
         url = f"https://{self.server}/vmrest/handlers/callhandlers?templateObjectId={self.call_handler_template_id}"
 
         payload = json.dumps({
-            "DisplayName": "test_transfer"
+            "DisplayName": handler.get_name()
         })
         headers = {
             'Accept': 'application/json',
@@ -65,7 +65,7 @@ class CUCConnector:
                                  data=payload,verify=False)
 
         if response.status_code == 201: 
-            print(f"Call handler '{handler.get_name()}' created: {response.text}\n")
+            print(f"Call handler '{handler.get_name()}' created: {response.text}")
             parts = response.text.split('/')
             handler.UnityId = parts[-1]
         else:
@@ -164,7 +164,7 @@ class CUCConnector:
     the handler object must already contain a pilot identifer number.
     equivalent to the pilot identifier in exchange UM.
     """
-    def set_dmf_access_id(self, handler:CallHandler):
+    def set_dtmf_access_id(self, handler:CallHandler):
         url = f"https://{self.server}/vmrest/handlers/callhandlers/{handler.get_id()}/"
         payload = f"<CallHandler>\r\n    <DTMFAccessId>{handler.PilotIdentifierList}</DTMFAccessId>\r\n    </CallHander>"
         headers = {
