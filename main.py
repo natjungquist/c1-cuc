@@ -151,14 +151,13 @@ if __name__ == "__main__":
         print(f"audio file {audio_file_path} not found\n")
 
     # set access extension
-    if handler.PilotIdentifierList and handler.PilotIdentifierList != "0" and handler.PilotIdentifierList != 0:
-      cn.set_dtmf_access_id(handler)
+    # TODO NOT WORKING
+    # if handler.PilotIdentifierList and handler.PilotIdentifierList != "0" and handler.PilotIdentifierList != 0:
+    #   cn.set_dtmf_access_id(handler)
 
   if num_missing_wavs > 0:
     print(f"{num_missing_wavs} audio files not found for setting business hours menu prompt.")
   
-
-  # TODO: account for NULLS
 
   # TODO: after hours
   # TODO: set schedules
@@ -166,9 +165,7 @@ if __name__ == "__main__":
 
   # TODO sometimes there is an operatorextension but the - operator in the key mapping is different
   # TODO sometimes keymapping is false but there is a key mapping
+  # TODO sometimes there is a welcome greeting file but not a business menu prompt
 
   # set after hours audio file greeting
   # if AfterHoursWelcomeGreetingFilename is not silence.wav, create another handler and set its audio?
-
-
-

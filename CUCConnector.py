@@ -160,8 +160,8 @@ class CUCConnector:
     equivalent to the pilot identifier in exchange UM.
     """
     def set_dtmf_access_id(self, handler:CallHandler):
-        url = f"https://{self.server}/vmrest/handlers/callhandlers/{handler.get_id()}/"
-        payload = f"<CallHandler>\r\n    <DTMFAccessId>{handler.PilotIdentifierList}</DTMFAccessId>\r\n    </CallHander>"
+        url = f"https://{self.server}/vmrest/handlers/callhandlers/{handler.get_id()}"
+        payload = f"<Callhandler>\r\n    <DtmfAccessId>{handler.PilotIdentifierList}</DtmfAccessId>\r\n</Callhander>"
         headers = {
             'Accept': 'application/xml',
             'Content-Type': 'application/xml'
