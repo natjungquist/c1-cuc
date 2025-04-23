@@ -35,7 +35,7 @@ class CUCConnector:
             self.set_template_id(response.text)
             
         else:
-            print(f"Failed to get template object id: {response.status_code} - {response.text}")
+            print(f"ERROR: failed to get template object id: {response.status_code} - {response.text}")
 
     """
     sets template id of call handler objects at this server. 
@@ -65,11 +65,11 @@ class CUCConnector:
                                  data=payload,verify=False)
 
         if response.status_code == 201: 
-            print(f"Call handler '{handler.get_name()}' created: {response.text}")
+            print(f"'{handler.get_name()}' created: {response.text}")
             parts = response.text.split('/')
             handler.UnityId = parts[-1]
         else:
-            print(f"Failed to create call handler: {response.status_code} - {response.text}\n")
+            print(f"ERROR: failed to create call handler: {response.status_code} - {response.text}")
     
     """
     sets one key of a specified call handler to go to either a specified number or another call handler.
@@ -102,9 +102,9 @@ class CUCConnector:
         )
 
         if response.status_code == 204: 
-            print(f"Call handler dtmf mapping set for handler {handler.get_name()} with key: {key} and mapping: {transfer_to}\n")
+            print(f"{handler.get_name()} set with key: {key} and mapping: {transfer_to}")
         else:
-            print(f"Failed to set dtmf for handler {handler.get_name()} with key: {key} and mapping: {transfer_to}: {response.status_code} - {response.text}\n")
+            print(f"ERROR: failed to set dtmf for handler {handler.get_name()} with key: {key} and mapping: {transfer_to}: {response.status_code} - {response.text}")
     
     """
     sets a standard transfer rule for a specified call handler.
@@ -128,9 +128,9 @@ class CUCConnector:
         )
 
         if response.status_code == 204: 
-            print(f"Transfer rule set for handler {handler.get_name()}\n")
+            print(f"{handler.get_name()} transfer rule set")
         else:
-            print(f"Failed to set transfer rule for handler {handler.get_name()}: {response.status_code} - {response.text}\n")
+            print(f"ERROR: failed to set transfer rule for handler {handler.get_name()}: {response.status_code} - {response.text}")
 
     """
     uploads an audio file to be the standard greeting of a call handler.
@@ -150,9 +150,9 @@ class CUCConnector:
             )
 
         if response.status_code == 204:
-            print(f"Uploaded {file_path} for handler {handler.get_name()}\n")
+            print(f"{handler.get_name()} business hours main menu prompt uploaded")
         else:
-            print(f"Failed to upload {file_path} for handler {handler.get_name()}: {response.status_code} - {response.text}\n")
+            print(f"ERROR: failed to upload {file_path} for handler {handler.get_name()}: {response.status_code} - {response.text}")
 
     """
     sets the dmfm access id for a specified call handler.
@@ -161,20 +161,24 @@ class CUCConnector:
     """
     def set_dtmf_access_id(self, handler:CallHandler):
         url = f"https://{self.server}/vmrest/handlers/callhandlers/{handler.get_id()}"
-        payload = f"<Callhandler>\r\n    <DtmfAccessId>{handler.PilotIdentifierList}</DtmfAccessId>\r\n</Callhander>"
+        payload =json.dumps({
+            "DtmfAccessId": handler.PilotIdentifierList
+        })
         headers = {
-            'Accept': 'application/xml',
-            'Content-Type': 'application/xml'
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
         }
 
         response = requests.put(url, headers=headers, auth = (self.username, self.password),
             data=payload, verify=False
-        )
+        ) 
 
         if response.status_code == 204: 
-            print(f"Call handler {handler.get_name()} DTMFAccessId set with {handler.PilotIdentifierList}\n")
+            print(f"{handler.get_name()} DTMFAccessId set with {handler.PilotIdentifierList}")
+        elif response.status_code == 400 and "Duplicate" in response.text:
+            print(f"ERROR: {handler.get_name()} DTMF access ID not set because another handler is already assigned to it.")
         else:
-            print(f"Failed to set DTMFAccessId for {handler.get_name()}: {response.status_code} - {response.text}\n")
+            print(f"ERROR: failed to set DTMFAccessId for {handler.get_name()}: {response.status_code} - {response.text}")
     
 
     """

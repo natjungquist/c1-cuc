@@ -57,7 +57,7 @@ def set_business_hours_keys_and_transfer_rules(handler:CallHandler, cn:CUCConnec
 
         cn.set_dtmf_mapping(key, transfer_to, handler, is_to_number=True)
       else:
-        print(f"error: failed to parse business hours key mapping for handler {handler.Name}\n")
+        print(f"ERROR: failed to parse business hours key mapping for handler {handler.Name}\n")
 
     elif (mapping_parts[3] != ''): # go to a another handler
       transfer_to = mapping_parts[3]
@@ -67,7 +67,7 @@ def set_business_hours_keys_and_transfer_rules(handler:CallHandler, cn:CUCConnec
         transfer_to = handler_next.get_id()
 
       if not transfer_to:
-        print(f"error getting id of handler to transfer to\n")
+        print(f"ERROR: error getting id of handler to transfer to\n")
       else:
         cn.set_dtmf_mapping(key, transfer_to, handler, is_to_number=False)
 
@@ -85,6 +85,41 @@ def set_business_hours_keys_and_transfer_rules(handler:CallHandler, cn:CUCConnec
         
     # except IndexError:
     #    print(f"index error on {handler.Name}: {handler.BusinessHoursKeyMapping} -- {mapping_parts}")
+
+"""
+assumes the handler always has only one after hours mapping
+"""
+def set_after_hours_rule(handler:CallHandler, cn:CUCConnector, call_handlers):
+  mapping_list = handler.AfterHoursKeyMapping.split(';')
+
+  for mapping in mapping_list:
+    mapping_parts = mapping.split(',')
+
+    transfer_to = None
+    key = mapping_parts[0].strip()
+
+    if (mapping_parts[2] != ''): # go to a number
+      transfer_to = mapping_parts[2]
+
+      if len(transfer_to) == 4: #only an extension was specified
+        transfer_to = get_full_number(transfer_to, handler)
+
+      if len(transfer_to) == 9: #must be 9 digits long to proceed
+        pass # TODO
+      else:
+        print(f"ERROR: failed to parse after hours key mapping for handler {handler.Name}\n")
+
+    elif (mapping_parts[3] != ''): # go to a another handler
+      transfer_to = mapping_parts[3]
+
+      handler_next = call_handlers.get(transfer_to)
+      if handler_next:
+        transfer_to = handler_next.get_id()
+
+      if not transfer_to:
+        print(f"ERROR: error getting id of handler to transfer to\n")
+      else:
+        pass # TODO
 
 
 
@@ -105,6 +140,7 @@ if __name__ == "__main__":
 
   FILE = config["autoAttendantsFile"]
   PATH_TO_AUDIO_FILES = os.path.join(os.getcwd(), "converted_wav_files") 
+  INVALID_OPTIONS = ["0", 0, "silence.wav", "silence2.wav"]
 
   SERVER = config["server"]
   USERNAME = config["username"]
@@ -139,33 +175,46 @@ if __name__ == "__main__":
       set_business_hours_keys_and_transfer_rules(handler, cn, call_handlers)
 
     # set business hours audio file greeting
-    if handler.BusinessHoursMainMenuCustomPromptFilename and handler.BusinessHoursMainMenuCustomPromptFilename != "0" and handler.BusinessHoursMainMenuCustomPromptFilename != 0:
+    num_missing_wavs = 0
+
+    if handler.BusinessHoursMainMenuCustomPromptFilename and handler.BusinessHoursMainMenuCustomPromptFilename not in INVALID_OPTIONS:
       target_filename = handler.BusinessHoursMainMenuCustomPromptFilename.lower()
       audio_file_path = get_audio_file_path(target_filename, PATH_TO_AUDIO_FILES)
-
-      num_missing_wavs = 0
+      
       if audio_file_path:
         cn.upload_greeting(audio_file_path, handler)
       else:
         num_missing_wavs += 1
-        print(f"audio file {audio_file_path} not found\n")
+        print(f"ERROR: audio file {audio_file_path} not found\n")
+
+    elif handler.BusinessHoursWelcomeGreetingFilename and handler.BusinessHoursWelcomeGreetingFilename not in INVALID_OPTIONS:
+      target_filename = handler.BusinessHoursWelcomeGreetingFilename.lower()
+      audio_file_path = get_audio_file_path(target_filename, PATH_TO_AUDIO_FILES)
+      
+      if audio_file_path:
+        cn.upload_greeting(audio_file_path, handler)
+      else:
+        num_missing_wavs += 1
+        print(f"ERROR: audio file {audio_file_path} not found\n")
 
     # set access extension
-    # TODO NOT WORKING
-    # if handler.PilotIdentifierList and handler.PilotIdentifierList != "0" and handler.PilotIdentifierList != 0:
-    #   cn.set_dtmf_access_id(handler)
+    if handler.PilotIdentifierList and handler.PilotIdentifierList not in INVALID_OPTIONS:
+      cn.set_dtmf_access_id(handler)
+
+    # TODO: after hours
+    # if handler.AfterHoursWelcomeGreetingFilename and handler.AfterHoursWelcomeGreetingFilename not in INVALID_OPTIONS:
+    #   pass
+    # if handler.AfterHoursKeyMappingEnabled:
+    #   make it transfer to the number ot handler specified
+    # TODO: the AfterHoursMainMenuCustomPromptFilename do not correspond to after hours handler names
+    # TODO: the AfterHoursKeyMappings do correspond to handler names
 
   if num_missing_wavs > 0:
-    print(f"{num_missing_wavs} audio files not found for setting business hours menu prompt.")
+    print(f"ERRORS: {num_missing_wavs} audio files not found for setting business hours menu prompt.\n")
   
 
-  # TODO: after hours
   # TODO: set schedules
 
 
   # TODO sometimes there is an operatorextension but the - operator in the key mapping is different
   # TODO sometimes keymapping is false but there is a key mapping
-  # TODO sometimes there is a welcome greeting file but not a business menu prompt
-
-  # set after hours audio file greeting
-  # if AfterHoursWelcomeGreetingFilename is not silence.wav, create another handler and set its audio?

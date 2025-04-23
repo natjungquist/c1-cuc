@@ -11,9 +11,9 @@ class CallHandler:
     self.OperatorExtension = data['OperatorExtension']
     self.BusinessHoursWelcomeGreetingFilename = data['BusinessHoursWelcomeGreetingFilename']
     self.BusinessHoursMainMenuCustomPromptFilename = data['BusinessHoursMainMenuCustomPromptFilename']
-    self.BusinessHoursKeyMapping = data['BusinessHoursKeyMapping']                  
+    self.BusinessHoursKeyMapping = data['BusinessHoursKeyMapping']         
     self.BusinessHoursKeyMappingEnabled = True if data['BusinessHoursKeyMappingEnabled'] else False        
-    self.AfterHoursWelcomeGreetingFilename = data['AfterHoursWelcomeGreetingFilename']       
+    self.AfterHoursWelcomeGreetingFilename = data['AfterHoursWelcomeGreetingFilename']     
     self.AfterHoursMainMenuCustomPromptFilename = data['AfterHoursMainMenuCustomPromptFilename']
     self.AfterHoursKeyMapping = data['AfterHoursKeyMapping']                         
     self.AfterHoursKeyMappingEnabled = True if data['AfterHoursKeyMappingEnabled'] else False
