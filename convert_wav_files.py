@@ -1,6 +1,8 @@
+# Utility program to convert all audio files in a specified directory to the specific 
+# format of .wav file that the CUC API expects to recieve.
+
 import ffmpeg
 import os
-import urllib3
 
 """
 converts the Microsoft ASF file to RIFF (little-endian) data, WAVE audio, Microsoft PCM, 16 bit, mono 8000 Hz
@@ -34,13 +36,26 @@ def convert_all_wav_files(source_dir):
           output_path = os.path.join(output_dir, name + ".wav")
           convert_to_wav(input_path, output_path)
 
-
+"""
+Asks the user for the directory containing the WAV files.
+Returns the absolute path to the directory.
+"""
+def get_source_audio_directory():
+  while True:
+    user_input = input("Please enter the directory containing the WAV files (or press Enter for 'UMAWAVFiles' in the current directory): ").strip()
+    if not user_input:
+      default_path = os.path.join(os.getcwd(), "UMAWAVFiles")
+      print(f"Using default directory: {default_path}")
+      return default_path
+    elif os.path.isdir(user_input):
+      return os.path.abspath(user_input)
+    else:
+      print("Invalid directory path. Please try again.")
 
 """
 main program execution.
 """
 if __name__ == "__main__":
-  urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-
-  source_audio_dir = os.path.join(os.getcwd(), "audioFiles")
+  source_audio_dir = get_source_audio_directory()
   convert_all_wav_files(source_audio_dir)
+  print("WAV file processing complete.")

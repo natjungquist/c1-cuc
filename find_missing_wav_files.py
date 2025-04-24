@@ -1,10 +1,15 @@
-# main
+# Utility program to compare all WAV files specified in the handler data to the WAV files
+# that this project contains. If any cannot be found, the names of the missing WAV files 
+# are printed out to a log file.
 
 # python -m pip install pandas
 from CallHandler import CallHandler
 import pandas as pd
 import json
 import os
+import sys
+
+INVALID_OPTIONS = ["0", 0, "silence.wav", "silence2.wav"]
 
 """
 finds the specific business hours wav file 
@@ -13,8 +18,11 @@ from the directory with all the wav files.
 def get_audio_file_path(target_filename, path_to_audio_files):
   for filename in os.listdir(path_to_audio_files):
     if filename.endswith(".wav") and filename == target_filename:
-        file_path = os.path.join(path_to_audio_files, filename)
-        return file_path
+      file_path = os.path.join(path_to_audio_files, filename)
+      return file_path
+    elif filename.endswith(".wma") and filename[:-4] == target_filename:
+      file_path = os.path.join(path_to_audio_files, filename)
+      return file_path
     
 """
 writes a missing audio filename to a log file.
@@ -30,6 +38,18 @@ def _log_to_file(filename: str, info_to_write: str):
     except Exception as e:
         print(f"ERROR: could not write to log file '{filename}': {e}\n")
 
+"""
+Asks the user for the filename they want to log the missing wav files to.
+"""
+def get_log_file_name():
+  while True:
+    user_input = input("Please enter the name of the log file for missing WAVs (or press Enter to use 'missing_wavs.txt' in the current directory): ").strip()
+    if not user_input:
+      default_name = "missing_wavs.txt"
+      print(f"Using default file name: {default_name}")
+      return default_name
+    else:
+       return user_input
 
 """
 main program execution.
@@ -41,14 +61,14 @@ if __name__ == "__main__":
     config = json.load(config_file)
 
   FILE = config["autoAttendantsFile"]
-  PATH_TO_AUDIO_FILES = os.path.join(os.getcwd(), "converted_wav_files") 
-  INVALID_OPTIONS = ["0", 0, "silence.wav", "silence2.wav"]
+  PATH_TO_AUDIO_FILES = os.path.join(os.getcwd(), "UMAWAVFiles") 
 
-  MISSING_WAVS_LOGFILE = "missing_wavs.txt"
-
+  MISSING_WAVS_LOGFILE = get_log_file_name()
+  with open(MISSING_WAVS_LOGFILE, "w") as log_file:
+    log_file.write("MISSING AUDIO FILE NAMES\n")
+     
   # set info for all handlers
   call_handlers = {} #key: name, value:handler
-
   df = pd.read_csv(FILE)
 
   # check all the handlers' info
@@ -56,14 +76,58 @@ if __name__ == "__main__":
       handler = CallHandler(row)
       call_handlers[handler.Name] = handler
 
-      # _log_to_file(MISSING_WAVS_FILE, transfer_to)
-  
+      if handler.BusinessHoursKeyMapping not in INVALID_OPTIONS:
+         mapping_list = handler.BusinessHoursKeyMapping.split(';')
+         for mapping in mapping_list:
+            mapping_parts = mapping.split(',')
+            if len(mapping_parts) < 4:
+              print("ERROR: business hours mapping parts")
+              print(handler.Name)
+              sys.exit()
+            if (mapping_parts[4] not in INVALID_OPTIONS): # this mapping goes to a wav file
+              filename = mapping_parts[4]
+              audio_file_path = get_audio_file_path(filename, PATH_TO_AUDIO_FILES)
+              if not audio_file_path:
+                 _log_to_file(MISSING_WAVS_LOGFILE, filename)
 
-    # TODO: after hours
-    # if handler.AfterHoursWelcomeGreetingFilename and handler.AfterHoursWelcomeGreetingFilename not in INVALID_OPTIONS:
-    #   pass
-    # if handler.AfterHoursKeyMappingEnabled:
-    #   make it transfer to the number ot handler specified
-    # TODO: the AfterHoursMainMenuCustomPromptFilename do not correspond to after hours handler names
-    # TODO: the AfterHoursKeyMappings do correspond to handler names
+      if handler.AfterHoursKeyMapping not in INVALID_OPTIONS:
+         mapping_list = handler.AfterHoursKeyMapping.split(';')
+         if len(mapping_list) != 1:
+            print("ERROR: after hours mapping list not length 1")
+            print(handler.Name)
+            sys.exit()
+         for mapping in mapping_list:
+            mapping_parts = mapping.split(',')
+            if len(mapping_parts) < 4:
+              print("ERROR: after hours mapping parts")
+              print(handler.Name)
+              sys.exit()
+            if (mapping_parts[4] not in INVALID_OPTIONS): # this mapping goes to a wav file
+              filename = mapping_parts[4]
+              audio_file_path = get_audio_file_path(filename, PATH_TO_AUDIO_FILES)
+              if not audio_file_path:
+                 _log_to_file(MISSING_WAVS_LOGFILE, filename)
+
+      if handler.BusinessHoursWelcomeGreetingFilename not in INVALID_OPTIONS:
+          audio_file_path = get_audio_file_path(filename, PATH_TO_AUDIO_FILES)
+          if not audio_file_path:
+            _log_to_file(MISSING_WAVS_LOGFILE, filename)
+
+      if handler.BusinessHoursMainMenuCustomPromptFilename not in INVALID_OPTIONS:
+          audio_file_path = get_audio_file_path(filename, PATH_TO_AUDIO_FILES)
+          if not audio_file_path:
+            _log_to_file(MISSING_WAVS_LOGFILE, filename)
+
+      if handler.AfterHoursWelcomeGreetingFilename not in INVALID_OPTIONS:
+          audio_file_path = get_audio_file_path(filename, PATH_TO_AUDIO_FILES)
+          if not audio_file_path:
+            _log_to_file(MISSING_WAVS_LOGFILE, filename)
+            
+      if handler.AfterHoursMainMenuCustomPromptFilename not in INVALID_OPTIONS:
+          audio_file_path = get_audio_file_path(filename, PATH_TO_AUDIO_FILES)
+          if not audio_file_path:
+            _log_to_file(MISSING_WAVS_LOGFILE, filename)
+
+      
+
   
