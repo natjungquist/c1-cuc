@@ -92,10 +92,6 @@ if __name__ == "__main__":
 
       if handler.AfterHoursKeyMapping not in INVALID_OPTIONS:
          mapping_list = handler.AfterHoursKeyMapping.split(';')
-         if len(mapping_list) != 1:
-            print("ERROR: after hours mapping list not length 1")
-            print(handler.Name)
-            sys.exit()
          for mapping in mapping_list:
             mapping_parts = mapping.split(',')
             if len(mapping_parts) < 4:
