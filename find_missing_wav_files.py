@@ -17,14 +17,6 @@ def get_audio_file_path(target_filename, path_to_audio_files):
         return file_path
     
 """
-helper method get full 9 digit number because 
-some handlers only specify a 4 digit extension.
-"""
-def get_full_number(extension, handler:CallHandler):
-  return '80' + handler.prefix + extension
-
-
-"""
 writes a missing audio filename to a log file.
 
 args:
