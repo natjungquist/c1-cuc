@@ -5,7 +5,8 @@
 class CallHandler:
 
   def __init__(self, data=None):
-    data = data or {}
+    if data is None:
+      data = {}
 
     # from customer data
     self.Name = data.get('Name', '')

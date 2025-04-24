@@ -61,7 +61,7 @@ if __name__ == "__main__":
     config = json.load(config_file)
 
   FILE = config["autoAttendantsFile"]
-  PATH_TO_AUDIO_FILES = os.path.join(os.getcwd(), "UMAWAVFiles") 
+  PATH_TO_AUDIO_FILES = os.path.join(os.getcwd(), "UMWAVFiles") 
 
   MISSING_WAVS_LOGFILE = get_log_file_name()
   with open(MISSING_WAVS_LOGFILE, "w") as log_file:
@@ -87,11 +87,12 @@ if __name__ == "__main__":
             if (mapping_parts[4] not in INVALID_OPTIONS): # this mapping goes to a wav file
               filename = mapping_parts[4]
               audio_file_path = get_audio_file_path(filename, PATH_TO_AUDIO_FILES)
+              print(audio_file_path)
               if not audio_file_path:
                  _log_to_file(MISSING_WAVS_LOGFILE, filename)
 
-      if handler.AfterHoursKeyMapping not in INVALID_OPTIONS:
-         mapping_list = handler.AfterHoursKeyMapping.split(';')
+      if handler.AfterHoursKeyMapping not in INVALID_OPTIONS and not pd.isna(handler.AfterHoursKeyMapping):
+         mapping_list = str(handler.AfterHoursKeyMapping).split(';')
          for mapping in mapping_list:
             mapping_parts = mapping.split(',')
             if len(mapping_parts) < 4:
@@ -123,6 +124,8 @@ if __name__ == "__main__":
           audio_file_path = get_audio_file_path(filename, PATH_TO_AUDIO_FILES)
           if not audio_file_path:
             _log_to_file(MISSING_WAVS_LOGFILE, filename)
+
+  print("done")
 
       
 
