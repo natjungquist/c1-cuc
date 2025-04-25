@@ -5,26 +5,11 @@
   # download ffmpeg exe. 7zip to Program Files\ffmpeg add to system path. 
 from CUCConnector import CUCConnector
 from CallHandler import CallHandler
+from find_missing_wav_files import get_audio_file_path, INVALID_OPTIONS
 import pandas as pd
 import json
 import os
 import urllib3
-
-
-INVALID_OPTIONS = ["0", 0, "", "silence.wav", "silence2.wav", '']
-
-"""
-finds the specific business hours wav file 
-from the directory with all the wav files.
-"""
-def get_audio_file_path(target_filename, path_to_audio_files):
-  for filename in os.listdir(path_to_audio_files):
-    if filename.endswith(".wav") and filename == target_filename:
-      file_path = os.path.join(path_to_audio_files, filename)
-      return file_path
-    elif filename.endswith(".wma") and filename[:-4] == target_filename:
-      file_path = os.path.join(path_to_audio_files, filename)
-      return file_path
     
 """
 helper method get full 9 digit number because 
@@ -62,7 +47,7 @@ specifications:
 """
 def set_business_hours_keys_and_transfer_rules(handler:CallHandler, cn:CUCConnector, call_handlers):
   # operator mapping
-  if handler.OperatorExtension not in INVALID_OPTIONS:
+  if handler.OperatorExtension and handler.OperatorExtension not in INVALID_OPTIONS and not pd.isna(handler.OperatorExtension):
     cn.set_dtmf_mapping("0", handler.OperatorExtension, handler, is_to_number=True)
 
   # other mappings
@@ -71,14 +56,13 @@ def set_business_hours_keys_and_transfer_rules(handler:CallHandler, cn:CUCConnec
   for mapping in mapping_list:
     mapping_parts = mapping.split(',')
     if len(mapping_parts) < 4:
-      print("ERROR: mapping parts")
-      return # TODO
+      print(f"ERROR: mapping parts invalid. Could not set business hours key mappings for '{handler.Name}'")
 
     transfer_to = None
     key = mapping_parts[0].strip()
 
     # option 1. go to a number
-    if (mapping_parts[2] != ''):
+    if (mapping_parts[2] not in INVALID_OPTIONS):
       transfer_to = mapping_parts[2]
       if len(transfer_to) == 4: #only an extension was specified
         transfer_to = get_full_number(transfer_to, handler)
@@ -92,19 +76,19 @@ def set_business_hours_keys_and_transfer_rules(handler:CallHandler, cn:CUCConnec
         else: #not a dash, set mapping
           cn.set_dtmf_mapping(key, transfer_to, handler, is_to_number=True)
       else:
-        print(f"ERROR: could not make 9-digit key mapping for handler {handler.Name}\n")
+        print(f"ERROR: could not make 9-digit key mapping for handler '{handler.Name}'\n")
 
     # option 2. go to another call handler that already exists
-    elif (mapping_parts[3] != ''): #TODO not in 
+    elif (mapping_parts[3] not in INVALID_OPTIONS):
       transfer_to = mapping_parts[3]
 
       handler_next = call_handlers.get(transfer_to)
       if handler_next:
-        transfer_to = handler_next.get_id()
+        handler_next_id = handler_next.get_id()
       else:
-        transfer_to = None
+        handler_next_id = None
 
-      if not transfer_to:
+      if not handler_next_id:
         print(f"ERROR: error getting id of handler to transfer to\n")
       else:
         cn.set_dtmf_mapping(key, transfer_to, handler, is_to_number=False)
@@ -121,7 +105,7 @@ def set_business_hours_keys_and_transfer_rules(handler:CallHandler, cn:CUCConnec
       
       audio_file_path = get_audio_file_path(transfer_to, PATH_TO_AUDIO_FILES)
       if audio_file_path:
-        cn.upload_greeting(audio_file_path, new_handler)
+        cn.upload_greeting(audio_file_path, new_handler, 'Standard')
       else:
         print(f"ERROR: audio file {audio_file_path} not found\n")   
 
@@ -130,9 +114,65 @@ def set_business_hours_keys_and_transfer_rules(handler:CallHandler, cn:CUCConnec
     
     # set the transfer rule to the OperatorExtension if there was not already one specified
     if not has_dash:
-      if handler.OperatorExtension not in INVALID_OPTIONS:
+      if handler.OperatorExtension and handler.OperatorExtension not in INVALID_OPTIONS:
         handler.set_transfer_rule_extension(handler.OperatorExtension)
         cn.set_transfer_rule(handler)
+
+
+"""
+checks if the handler already exists.
+
+returns:
+  true of it already exists, false if not.
+"""
+def handler_exists(name, call_handlers):
+  desired_handler = call_handlers.get(name)
+  if desired_handler:
+    return True
+  return False
+
+"""
+assumptions:
+- handler has AfterHoursKeyMapping
+- the AfterHoursKeyMapping is formatted correctly
+- the mapping has 1 value
+- it is '-' going to another handler, referenced by its name
+- the other handler already exists
+"""
+def set_after_hours_to_handler(handler:CallHandler, call_handlers):
+  mapping_parts = handler.AfterHoursKeyMapping.split(',')
+  if len(mapping_parts) < 3:
+    print(f"ERROR: mapping parts invalid for after hours key mapping on handler '{handler.Name}'")
+
+  if mapping_parts[3] not in INVALID_OPTIONS:
+    transfer_to = mapping_parts[3]
+
+    handler_next = call_handlers.get(transfer_to)
+    if handler_next:
+      handler_next_id = handler_next.get_id()
+    else:
+      handler_next_id = None
+
+    if not handler_next_id:
+      print(f"ERROR: error getting id of handler to transfer to for after hours on handler '{handler.Name}'\n")
+    else:
+      pass # TODO
+
+"""
+assumptions:
+- 
+"""
+def set_closed_greeting(handler:CallHandler):
+  pass
+
+"""
+assumptions:
+- 
+"""
+def create_new_after_hours_handler(handler:CallHandler):
+  pass
+
+
 
 
 """
@@ -174,39 +214,55 @@ if __name__ == "__main__":
     handler: CallHandler
 
     # set businss hours key mappings and transfer rules
-    if handler.BusinessHoursKeyMapping not in INVALID_OPTIONS:
+    if handler.BusinessHoursKeyMapping and handler.BusinessHoursKeyMapping not in INVALID_OPTIONS and not pd.isna(handler.BusinessHoursKeyMapping):
       set_business_hours_keys_and_transfer_rules(handler, cn, call_handlers)
 
-    # set business hours audio file greeting # TODO
-    if handler.BusinessHoursMainMenuCustomPromptFilename not in INVALID_OPTIONS:
+    # set business hours audio file greeting
+    if handler.BusinessHoursMainMenuCustomPromptFilename and handler.BusinessHoursMainMenuCustomPromptFilename not in INVALID_OPTIONS and not pd.isna(handler.BusinessHoursMainMenuCustomPromptFilename):
       target_filename = handler.BusinessHoursMainMenuCustomPromptFilename.lower()
       audio_file_path = get_audio_file_path(target_filename, PATH_TO_AUDIO_FILES)
       
       if audio_file_path:
-        cn.upload_greeting(audio_file_path, handler)
+        cn.upload_greeting(audio_file_path, handler, 'Standard')
       else:
         print(f"ERROR: audio file {audio_file_path} not found\n")
 
-    elif handler.BusinessHoursWelcomeGreetingFilename not in INVALID_OPTIONS:
+    elif handler.BusinessHoursWelcomeGreetingFilename and handler.BusinessHoursWelcomeGreetingFilename not in INVALID_OPTIONS and not pd.isna(handler.BusinessHoursWelcomeGreetingFilename):
       target_filename = handler.BusinessHoursWelcomeGreetingFilename.lower()
       audio_file_path = get_audio_file_path(target_filename, PATH_TO_AUDIO_FILES)
       
       if audio_file_path:
-        cn.upload_greeting(audio_file_path, handler)
+        cn.upload_greeting(audio_file_path, handler, 'Standard')
       else:
         print(f"ERROR: audio file {audio_file_path} not found\n")
 
-    # set access extension
-    if handler.PilotIdentifierList not in INVALID_OPTIONS:
+    # set access number
+    if handler.PilotIdentifierList and handler.PilotIdentifierList not in INVALID_OPTIONS and not pd.isna(handler.PilotIdentifierList):
       cn.set_dtmf_access_id(handler)
 
-    # TODO: after hours
+    # configure settings for after hours # TODO
     # after hours cases:
-    # - main menu prompt is null. key mapping goes to another handler, assume it already exists. (157-umaa-02-main_spanish)
-    # - main menu prompt has a filename. no key mappings. play a closed greeting. (283-umaa-02-main_spanish)
-    # - main menu prompt has a filename. yes key mappings. create a new handler if it doesnt already exist with this filename. set greeting. set mappings. (311-UMAA-01-Main_Spanish has lewisnightmainspanish.wav)
-    # - both greeting and main menu have filenames. means it is playing two wav files back to back. but this is not possible in unity. so I will ignore this for now. (316-umaa-05-admin_spanish) 
-  
+    # - 1. main menu prompt is null. key is a dash that goes to another handler. interpret this as timeout -> go to handler. assume handler already exists. (157-umaa-02-main_spanish)
+    # - 2. main menu prompt has a filename. no key mappings. play a closed greeting. (283-umaa-02-main_spanish)
+    # - 3. main menu prompt has a filename. yes key mappings. create a new handler if it doesnt already exist with this filename. set greeting. set mappings. (311-UMAA-01-Main_Spanish has lewisnightmainspanish.wav)
+    # - 4. both greeting and main menu have filenames. means it is playing two wav files back to back. but this is not possible in unity. so I will ignore this for now. (316-umaa-05-admin_spanish) 
+    
+    # case 1
+    if (not handler.AfterHoursMainMenuCustomPromptFilename or handler.AfterHoursMainMenuCustomPromptFilename in INVALID_OPTIONS and handler.AfterHoursKeyMapping) and handler.AfterHoursKeyMapping and handler.AfterHoursKeyMapping not in INVALID_OPTIONS:
+      set_after_hours_to_handler(handler, call_handlers)
+
+    # case 2
+    elif handler.AfterHoursMainMenuCustomPromptFilename and handler.AfterHoursMainMenuCustomPromptFilename not in INVALID_OPTIONS and (not handler.AfterHoursKeyMapping or handler.AfterHoursKeyMapping in INVALID_OPTIONS):
+      pass
+
+    # case 3
+    elif handler.AfterHoursMainMenuCustomPromptFilename and handler.AfterHoursMainMenuCustomPromptFilename not in INVALID_OPTIONS and handler.AfterHoursKeyMapping and handler.AfterHoursKeyMapping not in INVALID_OPTIONS:
+      pass
+
+    # case 4
+    elif handler.AfterHoursWelcomeGreetingFilename and handler.AfterHoursWelcomeGreetingFilename not in INVALID_OPTIONS and handler.AfterHoursMainMenuCustomPromptFilename and handler.AfterHoursMainMenuCustomPromptFilename not in INVALID_OPTIONS:
+      pass
+
 
   # TODO: set schedules
 

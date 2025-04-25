@@ -38,10 +38,6 @@ def get_audio_file_path(target_filename, path_to_audio_files):
       if filename[:-4] == target_filename or filename.startswith(target_filename[:-4]) or target_filename.startswith(filename):
         file_path = os.path.join(path_to_audio_files, filename)
         return file_path[:-4]
-      
-    if filename.startswith('023-umaa-01-english_main') and target_filename.startswith('023-umaa-01-english_main'):
-       pass
-    # we want english main but we have main english
 
   return None
     

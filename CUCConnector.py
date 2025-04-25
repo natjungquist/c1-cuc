@@ -104,7 +104,7 @@ class CUCConnector:
         if response.status_code == 204: 
             print(f"{handler.Name} set with key: {key} and mapping: {transfer_to}")
         else:
-            print(f"ERROR: failed to set dtmf for handler {handler.Name} with key: {key} and mapping: {transfer_to}: {response.status_code} - {response.text}")
+            print(f"ERROR: failed to set dtmf for handler '{handler.Name}' with key: {key} and mapping: {transfer_to}: {response.status_code} - {response.text}")
     
     """
     sets a standard transfer rule for a specified call handler.
@@ -130,15 +130,18 @@ class CUCConnector:
         if response.status_code == 204: 
             print(f"{handler.Name} transfer rule set")
         else:
-            print(f"ERROR: failed to set transfer rule for handler {handler.Name}: {response.status_code} - {response.text}")
+            print(f"ERROR: failed to set transfer rule for handler '{handler.Name}': {response.status_code} - {response.text}")
 
     """
-    uploads an audio file to be the standard greeting of a call handler.
+    uploads an audio file to be the greeting of a call handler.
     file_path specifies the absolute path to the audio file. 
     audio file must be RIFF (little-endian) data, WAVE audio, PCM, 16 bit, mono 8000 Hz.
+
+    args:
+        greeting_type: a string 'Standard' or 'Closed'
     """
-    def upload_greeting(self, file_path, handler:CallHandler):
-        url = f"https://{self.server}/vmrest/handlers/callhandlers/{handler.get_id()}/greetings/Standard/greetingstreamfiles/1033/audio"
+    def upload_greeting(self, file_path, handler:CallHandler, greeting_type):
+        url = f"https://{self.server}/vmrest/handlers/callhandlers/{handler.get_id()}/greetings/{greeting_type}/greetingstreamfiles/1033/audio"
         headers = {
             "Content-Type":"audio/wav",
             "Accept":"application/json",
@@ -150,9 +153,9 @@ class CUCConnector:
             )
 
         if response.status_code == 204:
-            print(f"{handler.Name} business hours main menu prompt uploaded")
+            print(f"'{handler.Name}' business hours main menu prompt uploaded")
         else:
-            print(f"ERROR: failed to upload {file_path} for handler {handler.Name}: {response.status_code} - {response.text}")
+            print(f"ERROR: failed to upload {file_path} for handler '{handler.Name}': {response.status_code} - {response.text}")
 
     """
     sets the dmfm access id for a specified call handler.
@@ -176,9 +179,9 @@ class CUCConnector:
         if response.status_code == 204: 
             print(f"{handler.Name} DTMFAccessId set with {handler.PilotIdentifierList}")
         elif response.status_code == 400 and "Duplicate" in response.text:
-            print(f"ERROR: {handler.Name} DTMF access ID not set because another handler is already assigned to it.")
+            print(f"ERROR: '{handler.Name}' DTMF access ID not set because another handler is already assigned to it.")
         else:
-            print(f"ERROR: failed to set DTMFAccessId for {handler.Name}: {response.status_code} - {response.text}")
+            print(f"ERROR: failed to set DTMFAccessId for '{handler.Name}': {response.status_code} - {response.text}")
     
 
     """
