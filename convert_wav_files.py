@@ -5,7 +5,7 @@ import ffmpeg
 import os
 
 """
-converts the Microsoft ASF file to RIFF (little-endian) data, WAVE audio, Microsoft PCM, 16 bit, mono 8000 Hz
+converts the Microsoft ASF or WMA file to RIFF (little-endian) data, WAVE audio, Microsoft PCM, 16 bit, mono 8000 Hz
 """
 def convert_to_wav(input_path, output_path):
   # print(platform.system())

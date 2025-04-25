@@ -11,7 +11,7 @@ import os
 import urllib3
 
 
-INVALID_OPTIONS = ["0", 0, "", "silence.wav", "silence2.wav"]
+INVALID_OPTIONS = ["0", 0, "", "silence.wav", "silence2.wav", '']
 
 """
 finds the specific business hours wav file 
@@ -95,12 +95,14 @@ def set_business_hours_keys_and_transfer_rules(handler:CallHandler, cn:CUCConnec
         print(f"ERROR: could not make 9-digit key mapping for handler {handler.Name}\n")
 
     # option 2. go to another call handler that already exists
-    elif (mapping_parts[3] != ''):
+    elif (mapping_parts[3] != ''): #TODO not in 
       transfer_to = mapping_parts[3]
 
       handler_next = call_handlers.get(transfer_to)
       if handler_next:
         transfer_to = handler_next.get_id()
+      else:
+        transfer_to = None
 
       if not transfer_to:
         print(f"ERROR: error getting id of handler to transfer to\n")

@@ -9,20 +9,41 @@ import json
 import os
 import sys
 
-INVALID_OPTIONS = ["0", 0, "silence.wav", "silence2.wav"]
+INVALID_OPTIONS = ["0", 0, "silence.wav", "silence2.wav", '']
 
 """
 finds the specific business hours wav file 
 from the directory with all the wav files.
+
+args:
+  target_filename: name of file we are looking for
+  path_to_audio_files: absolute path to the directory containing all audio files
+
+returns:
+  the absolute path to the audio file we are looking for.
+  None if it does not exist.
 """
 def get_audio_file_path(target_filename, path_to_audio_files):
+  target_filename = target_filename.lower()
+
   for filename in os.listdir(path_to_audio_files):
-    if filename.endswith(".wav") and filename.lower() == target_filename.lower():
-      file_path = os.path.join(path_to_audio_files, filename)
-      return file_path
-    elif filename.endswith(".wma") and filename[:-4].lower() == target_filename.lower():
-      file_path = os.path.join(path_to_audio_files, filename)
-      return file_path
+    filename = filename.lower()
+
+    if filename.endswith(".wav"):
+      if filename == target_filename or filename.startswith(target_filename) or target_filename.startswith(filename):
+        file_path = os.path.join(path_to_audio_files, filename)
+        return file_path
+      
+    elif filename.endswith(".wma"):
+      if filename[:-4] == target_filename or filename.startswith(target_filename[:-4]) or target_filename.startswith(filename):
+        file_path = os.path.join(path_to_audio_files, filename)
+        return file_path[:-4]
+      
+    if filename.startswith('023-umaa-01-english_main') and target_filename.startswith('023-umaa-01-english_main'):
+       pass
+    # we want english main but we have main english
+
+  return None
     
 """
 writes a missing audio filename to a log file.
@@ -106,21 +127,25 @@ if __name__ == "__main__":
                  _log_to_file(MISSING_WAVS_LOGFILE, filename)
 
       if handler.BusinessHoursWelcomeGreetingFilename and handler.BusinessHoursWelcomeGreetingFilename not in INVALID_OPTIONS and not pd.isna(handler.BusinessHoursWelcomeGreetingFilename):
+          filename = handler.BusinessHoursWelcomeGreetingFilename
           audio_file_path = get_audio_file_path(filename, PATH_TO_AUDIO_FILES)
           if not audio_file_path:
             _log_to_file(MISSING_WAVS_LOGFILE, filename)
 
       if handler.BusinessHoursMainMenuCustomPromptFilename and handler.BusinessHoursMainMenuCustomPromptFilename not in INVALID_OPTIONS and not pd.isna(handler.BusinessHoursMainMenuCustomPromptFilename):
+          filename = handler.BusinessHoursMainMenuCustomPromptFilename
           audio_file_path = get_audio_file_path(filename, PATH_TO_AUDIO_FILES)
           if not audio_file_path:
             _log_to_file(MISSING_WAVS_LOGFILE, filename)
 
       if handler.AfterHoursWelcomeGreetingFilename and handler.AfterHoursWelcomeGreetingFilename not in INVALID_OPTIONS and not pd.isna(handler.AfterHoursWelcomeGreetingFilename):
+          filename = handler.AfterHoursWelcomeGreetingFilename
           audio_file_path = get_audio_file_path(filename, PATH_TO_AUDIO_FILES)
           if not audio_file_path:
             _log_to_file(MISSING_WAVS_LOGFILE, filename)
             
       if handler.AfterHoursMainMenuCustomPromptFilename and handler.AfterHoursMainMenuCustomPromptFilename not in INVALID_OPTIONS and not pd.isna(handler.AfterHoursMainMenuCustomPromptFilename):
+          filename = handler.AfterHoursMainMenuCustomPromptFilename
           audio_file_path = get_audio_file_path(filename, PATH_TO_AUDIO_FILES)
           if not audio_file_path:
             _log_to_file(MISSING_WAVS_LOGFILE, filename)
