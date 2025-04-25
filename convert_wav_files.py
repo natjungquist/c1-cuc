@@ -33,7 +33,7 @@ def convert_all_wav_files(source_dir):
       input_path = os.path.join(source_dir, filename)
       if os.path.isfile(input_path):
           name, _ = os.path.splitext(filename)
-          output_path = os.path.join(output_dir, name + ".wav")
+          output_path = os.path.join(output_dir, name)
           convert_to_wav(input_path, output_path)
 
 """
@@ -42,9 +42,9 @@ Returns the absolute path to the directory.
 """
 def get_source_audio_directory():
   while True:
-    user_input = input("Please enter the directory containing the WAV files (or press Enter for 'UMAWAVFiles' in the current directory): ").strip()
+    user_input = input("Please enter the directory containing the WAV files (or press Enter for 'UMWAVFiles' in the current directory): ").strip()
     if not user_input:
-      default_path = os.path.join(os.getcwd(), "UMAWAVFiles")
+      default_path = os.path.join(os.getcwd(), "UMWAVFiles")
       print(f"Using default directory: {default_path}")
       return default_path
     elif os.path.isdir(user_input):
