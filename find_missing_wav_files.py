@@ -17,10 +17,10 @@ from the directory with all the wav files.
 """
 def get_audio_file_path(target_filename, path_to_audio_files):
   for filename in os.listdir(path_to_audio_files):
-    if filename.endswith(".wav") and filename == target_filename:
+    if filename.endswith(".wav") and filename.lower() == target_filename.lower():
       file_path = os.path.join(path_to_audio_files, filename)
       return file_path
-    elif filename.endswith(".wma") and filename[:-4] == target_filename:
+    elif filename.endswith(".wma") and filename[:-4].lower() == target_filename.lower():
       file_path = os.path.join(path_to_audio_files, filename)
       return file_path
     
@@ -76,7 +76,7 @@ if __name__ == "__main__":
       handler = CallHandler(row)
       call_handlers[handler.Name] = handler
 
-      if handler.BusinessHoursKeyMapping not in INVALID_OPTIONS:
+      if handler.BusinessHoursKeyMapping and handler.BusinessHoursKeyMapping not in INVALID_OPTIONS and not pd.isna(handler.BusinessHoursKeyMapping):
          mapping_list = handler.BusinessHoursKeyMapping.split(';')
          for mapping in mapping_list:
             mapping_parts = mapping.split(',')
@@ -91,7 +91,7 @@ if __name__ == "__main__":
               if not audio_file_path:
                  _log_to_file(MISSING_WAVS_LOGFILE, filename)
 
-      if handler.AfterHoursKeyMapping not in INVALID_OPTIONS and not pd.isna(handler.AfterHoursKeyMapping):
+      if handler.AfterHoursKeyMapping and handler.AfterHoursKeyMapping not in INVALID_OPTIONS and not pd.isna(handler.AfterHoursKeyMapping):
          mapping_list = str(handler.AfterHoursKeyMapping).split(';')
          for mapping in mapping_list:
             mapping_parts = mapping.split(',')
@@ -105,22 +105,22 @@ if __name__ == "__main__":
               if not audio_file_path:
                  _log_to_file(MISSING_WAVS_LOGFILE, filename)
 
-      if handler.BusinessHoursWelcomeGreetingFilename not in INVALID_OPTIONS:
+      if handler.BusinessHoursWelcomeGreetingFilename and handler.BusinessHoursWelcomeGreetingFilename not in INVALID_OPTIONS and not pd.isna(handler.BusinessHoursWelcomeGreetingFilename):
           audio_file_path = get_audio_file_path(filename, PATH_TO_AUDIO_FILES)
           if not audio_file_path:
             _log_to_file(MISSING_WAVS_LOGFILE, filename)
 
-      if handler.BusinessHoursMainMenuCustomPromptFilename not in INVALID_OPTIONS:
+      if handler.BusinessHoursMainMenuCustomPromptFilename and handler.BusinessHoursMainMenuCustomPromptFilename not in INVALID_OPTIONS and not pd.isna(handler.BusinessHoursMainMenuCustomPromptFilename):
           audio_file_path = get_audio_file_path(filename, PATH_TO_AUDIO_FILES)
           if not audio_file_path:
             _log_to_file(MISSING_WAVS_LOGFILE, filename)
 
-      if handler.AfterHoursWelcomeGreetingFilename not in INVALID_OPTIONS:
+      if handler.AfterHoursWelcomeGreetingFilename and handler.AfterHoursWelcomeGreetingFilename not in INVALID_OPTIONS and not pd.isna(handler.AfterHoursWelcomeGreetingFilename):
           audio_file_path = get_audio_file_path(filename, PATH_TO_AUDIO_FILES)
           if not audio_file_path:
             _log_to_file(MISSING_WAVS_LOGFILE, filename)
             
-      if handler.AfterHoursMainMenuCustomPromptFilename not in INVALID_OPTIONS:
+      if handler.AfterHoursMainMenuCustomPromptFilename and handler.AfterHoursMainMenuCustomPromptFilename not in INVALID_OPTIONS and not pd.isna(handler.AfterHoursMainMenuCustomPromptFilename):
           audio_file_path = get_audio_file_path(filename, PATH_TO_AUDIO_FILES)
           if not audio_file_path:
             _log_to_file(MISSING_WAVS_LOGFILE, filename)
