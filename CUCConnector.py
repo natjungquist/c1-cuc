@@ -1,8 +1,6 @@
 # CUCConnector
 # class that makes API requests to CUC
 
-import zipfile
-import os
 import requests
 import json
 from CallHandler import CallHandler
@@ -185,16 +183,18 @@ class CUCConnector:
     
 
     """
+    enables the closed greeting with not end date.
     sets a handler's closed action to map to an existing call handler on timeout.
     """
     def set_closed_handler(self, closed_handler_id, handler:CallHandler):
-        url = f"https://{self.server}/vmrest/handlers/callhandlers/{handler.get_id()}/greetings/closed"
+        url = f"https://{self.server}/vmrest/handlers/callhandlers/{handler.get_id()}/greetings/Off%20Hours"
         
-        payload = f"<Greeting>\r\n<CallAction>Transfer</CallAction>\r\n<TargetHandlerObjectId>{closed_handler_id}</TargetHandlerObjectId>\r\n</Greeting>"
+        payload = f"""<Greeting>\r\n    <Status>\r\n        <EndDateSelection>2</EndDateSelection>\r\n    </Status>\r\n     <AfterGreetingAction>2</AfterGreetingAction>\r\n        <AfterGreetingTargetConversation>PHTransfer</AfterGreetingTargetConversation>\r\n        <AfterGreetingTargetHandlerObjectId>{closed_handler_id}</AfterGreetingTargetHandlerObjectId>\r\n    \r\n\r\n</Greeting>
+        """
 
         headers = {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
+            'Accept': 'application/xml',
+            'Content-Type': 'application/xml'
         }
 
         response = requests.put(url, headers=headers, auth = (self.username, self.password),
