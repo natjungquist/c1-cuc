@@ -201,14 +201,10 @@ def test():
       cn.create_handler_and_get_id(handler) # create it
       call_handlers[handler.Name] = handler # add it to the dictionary of all handlers
   
-  print("setting business hours key mappings...")
-  print("setting transfer rules...")
-  print("uploading greetings...")
-  print("setting access numbers (pilot identifiers)...\n")
   for handler in call_handlers.values():
     handler: CallHandler
 
-    next_handler = call_handlers.get('test_closed')
+    next_handler = call_handlers.get('closed')
     cn.set_closed_handler(next_handler.get_id(), handler)
 
 
