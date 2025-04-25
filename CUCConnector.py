@@ -109,7 +109,7 @@ class CUCConnector:
     """
     sets a standard transfer rule for a specified call handler.
     """
-    def set_transfer_rule(self, handler:CallHandler):
+    def set_standard_transfer_rule_to_extension(self, handler:CallHandler):
         url = f"https://{self.server}/vmrest/handlers/callhandlers/{handler.get_id()}/transferoptions/Standard"
 
         payload = json.dumps({
@@ -183,6 +183,28 @@ class CUCConnector:
         else:
             print(f"ERROR: failed to set DTMFAccessId for '{handler.Name}': {response.status_code} - {response.text}")
     
+
+    """
+    sets a handler's closed action to map to an existing call handler on timeout.
+    """
+    def set_closed_handler(self, closed_handler_id, handler:CallHandler):
+        url = f"https://{self.server}/vmrest/handlers/callhandlers/{handler.get_id()}/greetings/closed"
+        
+        payload = f"<Greeting>\r\n<CallAction>Transfer</CallAction>\r\n<TargetHandlerObjectId>{closed_handler_id}</TargetHandlerObjectId>\r\n</Greeting>"
+
+        headers = {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        }
+
+        response = requests.put(url, headers=headers, auth = (self.username, self.password),
+            data=payload, verify=False
+        )
+
+        if response.status_code == 204:
+            print(f"'{handler.Name}' closed handler set")
+        else:
+            print(f"ERROR: failed to set closed handler for handler '{handler.Name}': {response.status_code} - {response.text}")
 
     """
     """

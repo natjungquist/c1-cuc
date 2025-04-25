@@ -72,7 +72,7 @@ def set_business_hours_keys_and_transfer_rules(handler:CallHandler, cn:CUCConnec
         if key == '-': #dash from customer data represents timeout
           has_dash = True
           handler.set_transfer_rule_extension(transfer_to)
-          cn.set_transfer_rule(handler)
+          cn.set_standard_transfer_rule_to_extension(handler)
         else: #not a dash, set mapping
           cn.set_dtmf_mapping(key, transfer_to, handler, is_to_number=True)
       else:
@@ -116,7 +116,7 @@ def set_business_hours_keys_and_transfer_rules(handler:CallHandler, cn:CUCConnec
     if not has_dash:
       if handler.OperatorExtension and handler.OperatorExtension not in INVALID_OPTIONS:
         handler.set_transfer_rule_extension(handler.OperatorExtension)
-        cn.set_transfer_rule(handler)
+        cn.set_standard_transfer_rule_to_extension(handler)
 
 
 """
@@ -156,7 +156,7 @@ def set_after_hours_to_handler(handler:CallHandler, call_handlers):
     if not handler_next_id:
       print(f"ERROR: error getting id of handler to transfer to for after hours on handler '{handler.Name}'\n")
     else:
-      pass # TODO
+      cn.set_closed_handler(handler_next_id, handler)
 
 """
 assumptions:
@@ -173,12 +173,45 @@ def create_new_after_hours_handler(handler:CallHandler):
   pass
 
 
+def test():
+  urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+  # load in config items
+  print("loading in config...\n")
+  with open('config.json') as config_file:
+    config = json.load(config_file)
+
+  FILE = "testclosed.csv"
+  SERVER = config["server"]
+  USERNAME = config["username"]
+  PASSWORD = config["password"]
+  cn = CUCConnector(SERVER, USERNAME, PASSWORD)
+  cn.get_template_id()
+
+  # set info for all handlers
+  call_handlers = {} #key: name, value:handler
+
+  df = pd.read_csv(FILE)
+
+  print("creating handlers...\n")
+  for index, row in df.iterrows():
+      handler = CallHandler(row)
+      cn.create_handler_and_get_id(handler) # create it
+      call_handlers[handler.Name] = handler # add it to the dictionary of all handlers
+  
+  print("setting business hours key mappings...")
+  print("setting transfer rules...")
+  print("uploading greetings...")
+  print("setting access numbers (pilot identifiers)...\n")
+  for handler in call_handlers.values():
+    handler: CallHandler
+
+    next_handler = call_handlers.get('test_closed')
+    cn.set_closed_handler(next_handler.get_id(), handler)
 
 
-"""
-main program execution.
-"""
-if __name__ == "__main__":
+
+def main():
   urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
   # load in config items
@@ -271,3 +304,11 @@ if __name__ == "__main__":
 # times to reprompt caller?
 # after greeting take message?
 
+
+
+
+"""
+main program execution.
+"""
+if __name__ == "__main__":
+  test()
