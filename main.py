@@ -10,6 +10,8 @@ import pandas as pd
 import json
 import os
 import urllib3
+
+PATH_TO_AUDIO_FILES = os.path.join(os.getcwd(), "converted_wav_files") 
     
 """
 helper method get full 9 digit number because 
@@ -139,7 +141,7 @@ assumptions:
 - it is '-' going to another handler, referenced by its name
 - the other handler already exists
 """
-def set_after_hours_to_handler(handler:CallHandler, call_handlers):
+def set_after_hours_to_handler(handler:CallHandler, call_handlers, cn:CUCConnector):
   mapping_parts = handler.AfterHoursKeyMapping.split(',')
   if len(mapping_parts) < 3:
     print(f"ERROR: mapping parts invalid for after hours key mapping on handler '{handler.Name}'")
@@ -220,8 +222,6 @@ def main():
     config = json.load(config_file)
 
   FILE = config["autoAttendantsFile"]
-  PATH_TO_AUDIO_FILES = os.path.join(os.getcwd(), "converted_wav_files") 
-
   SERVER = config["server"]
   USERNAME = config["username"]
   PASSWORD = config["password"]
@@ -282,7 +282,7 @@ def main():
     
     # case 1
     if (not handler.AfterHoursMainMenuCustomPromptFilename or handler.AfterHoursMainMenuCustomPromptFilename in INVALID_OPTIONS and handler.AfterHoursKeyMapping) and handler.AfterHoursKeyMapping and handler.AfterHoursKeyMapping not in INVALID_OPTIONS:
-      set_after_hours_to_handler(handler, call_handlers)
+      set_after_hours_to_handler(handler, call_handlers, cn)
 
     # case 2
     elif handler.AfterHoursMainMenuCustomPromptFilename and handler.AfterHoursMainMenuCustomPromptFilename not in INVALID_OPTIONS and (not handler.AfterHoursKeyMapping or handler.AfterHoursKeyMapping in INVALID_OPTIONS):
