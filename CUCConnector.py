@@ -207,10 +207,10 @@ class CUCConnector:
     """
     enable
     """
-    def set_closed_handler(self, handler:CallHandler):
+    def enable_closed(self, handler:CallHandler):
         url = f"https://{self.server}/vmrest/handlers/callhandlers/{handler.get_id()}/greetings/Off%20Hours"
         
-        payload = f"<Greeting>\r\n    <Status>\r\n        <EndDateSelection>2</EndDateSelection>\r\n    </Status>\r\n</Greeting>"
+        payload = f"<Greeting>\r\n  <Enabled>true</Enabled>\r\n  <TimeExpires>2029-01-01 05:30:00.0</TimeExpires> \r\n</Greeting>"
 
         headers = {
             'Accept': 'application/xml',

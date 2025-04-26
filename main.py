@@ -204,8 +204,7 @@ def test():
   for handler in call_handlers.values():
     handler: CallHandler
 
-    next_handler = call_handlers.get('closed')
-    cn.set_closed_handler(next_handler.get_id(), handler)
+    cn.enable_closed(handler)
 
 
 
