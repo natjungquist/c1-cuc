@@ -205,6 +205,28 @@ class CUCConnector:
             print(f"ERROR: failed to set closed handler for handler '{handler.Name}': {response.status_code} - {response.text}")
 
     """
+    enable
+    """
+    def set_closed_handler(self, handler:CallHandler):
+        url = f"https://{self.server}/vmrest/handlers/callhandlers/{handler.get_id()}/greetings/Off%20Hours"
+        
+        payload = f"<Greeting>\r\n    <Status>\r\n        <EndDateSelection>2</EndDateSelection>\r\n    </Status>\r\n</Greeting>"
+
+        headers = {
+            'Accept': 'application/xml',
+            'Content-Type': 'application/xml'
+        }
+
+        response = requests.put(url, headers=headers, auth = (self.username, self.password),
+            data=payload, verify=False
+        )
+
+        if response.status_code == 204:
+            print(f"'{handler.Name}' closed greeting enabled")
+        else:
+            print(f"ERROR: failed to enable closed greeting for handler '{handler.Name}': {response.status_code} - {response.text}")
+
+    """
     """
     def set_schedule(self, handler:CallHandler):
         url = f"https://{self.server}/vmrest/handlers/callhandlers/{handler.get_id()}/"
