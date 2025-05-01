@@ -10,7 +10,7 @@ import pandas as pd
 import json
 import os
 import urllib3
-from util import _log_error, _log_success
+from util import _log_error, init_logs
 
 PATH_TO_AUDIO_FILES = os.path.join(os.getcwd(), "converted_wav_files") 
     
@@ -260,59 +260,64 @@ def main():
   print("uploading greetings...")
   print("setting access numbers (pilot identifiers)...\n")
   for handler in call_handlers.values():
-    handler: CallHandler
+    try:
+      handler: CallHandler
 
-    # set businss hours key mappings and transfer rules
-    if handler.BusinessHoursKeyMapping and handler.BusinessHoursKeyMapping not in INVALID_OPTIONS and not pd.isna(handler.BusinessHoursKeyMapping):
-      set_business_hours_keys_and_transfer_rules(handler, cn, call_handlers)
+      # set businss hours key mappings and transfer rules
+      if handler.BusinessHoursKeyMapping and handler.BusinessHoursKeyMapping not in INVALID_OPTIONS and not pd.isna(handler.BusinessHoursKeyMapping):
+        set_business_hours_keys_and_transfer_rules(handler, cn, call_handlers)
 
-    # set business hours audio file greeting
-    if handler.BusinessHoursMainMenuCustomPromptFilename and handler.BusinessHoursMainMenuCustomPromptFilename not in INVALID_OPTIONS and not pd.isna(handler.BusinessHoursMainMenuCustomPromptFilename):
-      target_filename = handler.BusinessHoursMainMenuCustomPromptFilename.lower()
-      audio_file_path = get_audio_file_path(target_filename, PATH_TO_AUDIO_FILES)
+      # set business hours audio file greeting
+      if handler.BusinessHoursMainMenuCustomPromptFilename and handler.BusinessHoursMainMenuCustomPromptFilename not in INVALID_OPTIONS and not pd.isna(handler.BusinessHoursMainMenuCustomPromptFilename):
+        target_filename = handler.BusinessHoursMainMenuCustomPromptFilename.lower()
+        audio_file_path = get_audio_file_path(target_filename, PATH_TO_AUDIO_FILES)
+        
+        if audio_file_path:
+          cn.upload_greeting(audio_file_path, handler, 'Standard')
+        else:
+          _log_error(f"ERROR: audio file {audio_file_path} not found\n")
+
+      elif handler.BusinessHoursWelcomeGreetingFilename and handler.BusinessHoursWelcomeGreetingFilename not in INVALID_OPTIONS and not pd.isna(handler.BusinessHoursWelcomeGreetingFilename):
+        target_filename = handler.BusinessHoursWelcomeGreetingFilename.lower()
+        audio_file_path = get_audio_file_path(target_filename, PATH_TO_AUDIO_FILES)
+        
+        if audio_file_path:
+          cn.upload_greeting(audio_file_path, handler, 'Standard')
+        else:
+          _log_error(f"ERROR: audio file {audio_file_path} not found\n")
+
+      # set access number
+      if handler.PilotIdentifierList and handler.PilotIdentifierList not in INVALID_OPTIONS and not pd.isna(handler.PilotIdentifierList):
+        cn.set_dtmf_access_id(handler)
+
+      # configure settings for after hours
+      # after hours cases:
+      # - 1. main menu prompt is null. key is a dash that goes to another handler. interpret this as timeout -> go to handler. assume handler already exists. (157-umaa-02-main_spanish) (283-umaa-02-main_spanish)
+      # - 2. main menu prompt has a filename. no key mappings. play a closed greeting. (283-UMAA-02-Main_Spanish)
+      # - 3. main menu prompt has a filename. yes key mappings. create a new handler if it doesnt already exist with this filename. set greeting. set mappings. (311-UMAA-01-Main_Spanish has lewisnightmainspanish.wav)
+      # - 4. both greeting and main menu have filenames. means it is playing two wav files back to back. but this is not possible in unity. so I will ignore this for now. (316-umaa-05-admin_spanish) (367-UMAA-03-Nurse-English)
       
-      if audio_file_path:
-        cn.upload_greeting(audio_file_path, handler, 'Standard')
-      else:
-        _log_error(f"ERROR: audio file {audio_file_path} not found\n")
+      # case 1
+      if (not handler.AfterHoursMainMenuCustomPromptFilename or handler.AfterHoursMainMenuCustomPromptFilename in INVALID_OPTIONS and handler.AfterHoursKeyMapping) and handler.AfterHoursKeyMapping and handler.AfterHoursKeyMapping not in INVALID_OPTIONS:
+        set_after_hours_to_handler(handler, call_handlers, cn)
 
-    elif handler.BusinessHoursWelcomeGreetingFilename and handler.BusinessHoursWelcomeGreetingFilename not in INVALID_OPTIONS and not pd.isna(handler.BusinessHoursWelcomeGreetingFilename):
-      target_filename = handler.BusinessHoursWelcomeGreetingFilename.lower()
-      audio_file_path = get_audio_file_path(target_filename, PATH_TO_AUDIO_FILES)
-      
-      if audio_file_path:
-        cn.upload_greeting(audio_file_path, handler, 'Standard')
-      else:
-        _log_error(f"ERROR: audio file {audio_file_path} not found\n")
+      # case 2
+      elif handler.AfterHoursMainMenuCustomPromptFilename and handler.AfterHoursMainMenuCustomPromptFilename not in INVALID_OPTIONS and handler.AfterHoursWelcomeGreetingFilename and handler.AfterHoursWelcomeGreetingFilename in INVALID_OPTIONS and (not handler.AfterHoursKeyMapping or handler.AfterHoursKeyMapping in INVALID_OPTIONS):
+        set_closed_greeting(handler, cn, audio_path_name=handler.AfterHoursMainMenuCustomPromptFilename)
+      elif handler.AfterHoursMainMenuCustomPromptFilename and handler.AfterHoursMainMenuCustomPromptFilename in INVALID_OPTIONS and handler.AfterHoursWelcomeGreetingFilename and handler.AfterHoursWelcomeGreetingFilename not in INVALID_OPTIONS and (not handler.AfterHoursKeyMapping or handler.AfterHoursKeyMapping in INVALID_OPTIONS):
+        set_closed_greeting(handler, cn, audio_path_name=handler.AfterHoursWelcomeGreetingFilename)
 
-    # set access number
-    if handler.PilotIdentifierList and handler.PilotIdentifierList not in INVALID_OPTIONS and not pd.isna(handler.PilotIdentifierList):
-      cn.set_dtmf_access_id(handler)
+      # case 3
+      elif handler.AfterHoursMainMenuCustomPromptFilename and handler.AfterHoursMainMenuCustomPromptFilename not in INVALID_OPTIONS and handler.AfterHoursKeyMapping and handler.AfterHoursKeyMapping not in INVALID_OPTIONS:
+        create_new_after_hours_handler(handler, cn, call_handlers)
 
-    # configure settings for after hours
-    # after hours cases:
-    # - 1. main menu prompt is null. key is a dash that goes to another handler. interpret this as timeout -> go to handler. assume handler already exists. (157-umaa-02-main_spanish) (283-umaa-02-main_spanish)
-    # - 2. main menu prompt has a filename. no key mappings. play a closed greeting. (283-UMAA-02-Main_Spanish)
-    # - 3. main menu prompt has a filename. yes key mappings. create a new handler if it doesnt already exist with this filename. set greeting. set mappings. (311-UMAA-01-Main_Spanish has lewisnightmainspanish.wav)
-    # - 4. both greeting and main menu have filenames. means it is playing two wav files back to back. but this is not possible in unity. so I will ignore this for now. (316-umaa-05-admin_spanish) (367-UMAA-03-Nurse-English)
-    
-    # case 1
-    if (not handler.AfterHoursMainMenuCustomPromptFilename or handler.AfterHoursMainMenuCustomPromptFilename in INVALID_OPTIONS and handler.AfterHoursKeyMapping) and handler.AfterHoursKeyMapping and handler.AfterHoursKeyMapping not in INVALID_OPTIONS:
-      set_after_hours_to_handler(handler, call_handlers, cn)
+      # case 4
+      elif handler.AfterHoursWelcomeGreetingFilename and handler.AfterHoursWelcomeGreetingFilename not in INVALID_OPTIONS and handler.AfterHoursMainMenuCustomPromptFilename and handler.AfterHoursMainMenuCustomPromptFilename not in INVALID_OPTIONS:
+        pass
 
-    # case 2
-    elif handler.AfterHoursMainMenuCustomPromptFilename and handler.AfterHoursMainMenuCustomPromptFilename not in INVALID_OPTIONS and handler.AfterHoursWelcomeGreetingFilename and handler.AfterHoursWelcomeGreetingFilename in INVALID_OPTIONS and (not handler.AfterHoursKeyMapping or handler.AfterHoursKeyMapping in INVALID_OPTIONS):
-      set_closed_greeting(handler, cn, audio_path_name=handler.AfterHoursMainMenuCustomPromptFilename)
-    elif handler.AfterHoursMainMenuCustomPromptFilename and handler.AfterHoursMainMenuCustomPromptFilename in INVALID_OPTIONS and handler.AfterHoursWelcomeGreetingFilename and handler.AfterHoursWelcomeGreetingFilename not in INVALID_OPTIONS and (not handler.AfterHoursKeyMapping or handler.AfterHoursKeyMapping in INVALID_OPTIONS):
-      set_closed_greeting(handler, cn, audio_path_name=handler.AfterHoursWelcomeGreetingFilename)
-
-    # case 3
-    elif handler.AfterHoursMainMenuCustomPromptFilename and handler.AfterHoursMainMenuCustomPromptFilename not in INVALID_OPTIONS and handler.AfterHoursKeyMapping and handler.AfterHoursKeyMapping not in INVALID_OPTIONS:
-      create_new_after_hours_handler(handler, cn, call_handlers)
-
-    # case 4
-    elif handler.AfterHoursWelcomeGreetingFilename and handler.AfterHoursWelcomeGreetingFilename not in INVALID_OPTIONS and handler.AfterHoursMainMenuCustomPromptFilename and handler.AfterHoursMainMenuCustomPromptFilename not in INVALID_OPTIONS:
-      pass
+    except Exception as e:
+      _log_error(f"Unexpected error while processing handler '{handler.Name}': {e}")
+      continue
 
 
   
@@ -330,6 +335,10 @@ def main():
 main program execution.
 """
 if __name__ == "__main__":
+  init_logs()
   print("starting program...")
-  test()
+  try:
+    test()
+  except Exception as e:
+    _log_error(f"Fatal error in top-level execution: {e}")
   print("done.")
