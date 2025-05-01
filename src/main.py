@@ -115,11 +115,11 @@ def set_business_hours_keys_and_transfer_rules(handler:CallHandler, cn:CUCConnec
       # set this call handler to map to the new handler
       cn.set_dtmf_mapping(key, new_handler.get_id(), handler, is_to_number=False)
     
-    # set the transfer rule to the OperatorExtension if there was not already one specified
-    if not has_dash:
-      if handler.OperatorExtension and handler.OperatorExtension not in INVALID_OPTIONS:
-        handler.set_transfer_rule_extension(handler.OperatorExtension)
-        cn.set_standard_transfer_rule_to_extension(handler)
+  # set the transfer rule to the OperatorExtension if there was not already one specified
+  if not has_dash:
+    if handler.OperatorExtension and handler.OperatorExtension not in INVALID_OPTIONS:
+      handler.set_transfer_rule_extension(handler.OperatorExtension)
+      cn.set_standard_transfer_rule_to_extension(handler)
 
 
 """
@@ -163,17 +163,37 @@ def set_after_hours_to_handler(handler:CallHandler, call_handlers, cn:CUCConnect
 
 """
 assumptions:
+- handler.AfterHoursMainMenuCustomPromptFilename has a .wav file specified
+- no AfterHoursKeyMapping exists
+- the .wav file exists
 - 
 """
-def set_closed_greeting(handler:CallHandler):
-  pass
+def set_closed_greeting(handler:CallHandler, cn:CUCConnector):
+  audio_file_path = get_audio_file_path(handler.AfterHoursMainMenuCustomPromptFilename, PATH_TO_AUDIO_FILES)
+  if audio_file_path:
+    cn.upload_greeting(audio_file_path, handler, 'Closed')
+  else:
+    _log_error(f"ERROR: audio file {audio_file_path} not found\n")   
 
 """
 assumptions:
-- 
+- handler.AfterHoursWelcomeGreetingFilename has a .wav file specified. This file exists.
+- AfterHoursKeyMapping specified.
+- need to create a new handler for this .wav file and mappings.
+- reuse the operator extension of handler for the new handler.
 """
-def create_new_after_hours_handler(handler:CallHandler):
-  pass
+def create_new_after_hours_handler(handler:CallHandler, cn:CUCConnector, call_handlers):
+  name = remove_wav(handler.AfterHoursWelcomeGreetingFilename)
+  new_handler = CallHandler()
+  new_handler.Name = name
+  new_handler.BusinessHoursKeyMapping = handler.AfterHoursKeyMapping
+  if handler.OperatorExtension and handler.OperatorExtension not in INVALID_OPTIONS and not pd.isna(handler.OperatorExtension):
+    new_handler.OperatorExtension = handler.OperatorExtension
+
+  cn.create_handler_and_get_id(new_handler)
+  call_handlers[new_handler.Name] = new_handler
+
+  set_business_hours_keys_and_transfer_rules(new_handler, cn, call_handlers)  
 
 
 def test():
@@ -269,7 +289,7 @@ def main():
     if handler.PilotIdentifierList and handler.PilotIdentifierList not in INVALID_OPTIONS and not pd.isna(handler.PilotIdentifierList):
       cn.set_dtmf_access_id(handler)
 
-    # configure settings for after hours # TODO
+    # configure settings for after hours
     # after hours cases:
     # - 1. main menu prompt is null. key is a dash that goes to another handler. interpret this as timeout -> go to handler. assume handler already exists. (157-umaa-02-main_spanish)
     # - 2. main menu prompt has a filename. no key mappings. play a closed greeting. (283-umaa-02-main_spanish)
@@ -282,20 +302,21 @@ def main():
 
     # case 2
     elif handler.AfterHoursMainMenuCustomPromptFilename and handler.AfterHoursMainMenuCustomPromptFilename not in INVALID_OPTIONS and (not handler.AfterHoursKeyMapping or handler.AfterHoursKeyMapping in INVALID_OPTIONS):
-      set_closed_greeting(handler)
+      set_closed_greeting(handler, cn)
 
     # case 3
     elif handler.AfterHoursMainMenuCustomPromptFilename and handler.AfterHoursMainMenuCustomPromptFilename not in INVALID_OPTIONS and handler.AfterHoursKeyMapping and handler.AfterHoursKeyMapping not in INVALID_OPTIONS:
-      create_new_after_hours_handler(handler)
+      create_new_after_hours_handler(handler, cn, call_handlers)
 
     # case 4
     elif handler.AfterHoursWelcomeGreetingFilename and handler.AfterHoursWelcomeGreetingFilename not in INVALID_OPTIONS and handler.AfterHoursMainMenuCustomPromptFilename and handler.AfterHoursMainMenuCustomPromptFilename not in INVALID_OPTIONS:
       pass
 
 
-  # TODO: set schedules
+  
 
-# TODO other conf
+# TODO other conf might need to be done manually
+# TODO: set schedules
 # is there anything to set for settings during the greeting. allow them to record message after prompt??
 # times to reprompt caller?
 # after greeting take message?
