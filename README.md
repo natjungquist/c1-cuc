@@ -6,9 +6,12 @@ A specific customer of C1 has requested a way to automate a way to bulk export c
 
 ## Prerequisites
 
-* be a valid C1 engineer
+* Data for call handlers to be migrated. Must be CSV format.
+* Audio files/recordings saved together in a folder. Put this folder inside the `src` directory. 
+* Cisco Unity Connection server credentials.
+* Recommended application to run this program: VSCode.
 
-## Installation - DEVELOPMENT MODE
+## Installation
 
 1. **Clone the Repository**
    ```bash
@@ -16,13 +19,35 @@ A specific customer of C1 has requested a way to automate a way to bulk export c
    cd <repository-directory>
    ```
 
-3. **Install Python and pandas** (if not already installed)
+2. **Install Python and pandas** (if not already installed)
    - Install python at [python.org](https://www.python.org/downloads/)
         - This program was developed with python 3.11.4
    - Install dependencies:
      ```bash
      pip install pandas
      ```
+   To run convert_wav_files.py, also install ffmpeg:
+   - Download 7zip from: [7-zip.org](https://www.7-zip.org/download.html)
+   - Download ffmpeg from: [ffmpeg.org](https://www.ffmpeg.org/download.html)
+   - Extract ffmpeg with 7zip.
+   - Add ffmpeg executable to your PATH.
+   - Install python wrapper:
+      ```bash
+      pip install python-ffmpeg
+      ```
+3. **Make sure recordings are in the correct file format.**
+- Cisco Unity Connection only accepts recordings of type RIFF (little-endian) data, WAVE audio, 16 bit, mono 8000 Hz. Run `convert_wav_files.py` 
+4. **Create configuration file.**
+- In `src` directory, create `config.json`:
+   ```json
+   {
+      "server":"",
+      "username":"",
+      "password":"",
+      "autoAttendantsFile":"",
+      "recordingsDirectory":""
+   }
+   ```
 
 
 ## Contact 
