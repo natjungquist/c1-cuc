@@ -12,7 +12,10 @@ import os
 import urllib3
 from util import _log_error, init_logs
 
-PATH_TO_AUDIO_FILES = os.path.join(os.getcwd(), "converted_wav_files") 
+with open('config.json') as config_file:
+  config = json.load(config_file)
+
+PATH_TO_AUDIO_FILES = config["recordingsDirectory"]
     
 """
 helper method get full 9 digit number because 
@@ -79,7 +82,7 @@ def set_business_hours_keys_and_transfer_rules(handler:CallHandler, cn:CUCConnec
         else: #not a dash, set mapping
           cn.set_dtmf_mapping(key, transfer_to, handler, is_to_number=True)
       else:
-        _log_error(f"ERROR: could not make 9-digit key mapping for handler '{handler.Name}'\n")
+        _log_error(f"ERROR: could not make 9-digit key mapping for handler '{handler.Name}'")
 
     # option 2. go to another call handler that already exists
     elif (mapping_parts[3] not in INVALID_OPTIONS):
@@ -92,9 +95,9 @@ def set_business_hours_keys_and_transfer_rules(handler:CallHandler, cn:CUCConnec
         handler_next_id = None
 
       if not handler_next_id:
-        _log_error(f"ERROR: error getting id of handler to transfer to\n")
+        _log_error(f"ERROR: error getting id of handler to transfer to for business hours key mapping on '{handler.Name}")
       else:
-        cn.set_dtmf_mapping(key, transfer_to, handler, is_to_number=False)
+        cn.set_dtmf_mapping(key, handler_next_id, handler, is_to_number=False)
 
    # option 3. create a new call handler to go to
     elif (mapping_parts[4] not in INVALID_OPTIONS): # go to a wav file
@@ -110,7 +113,7 @@ def set_business_hours_keys_and_transfer_rules(handler:CallHandler, cn:CUCConnec
       if audio_file_path:
         cn.upload_greeting(audio_file_path, new_handler, 'Standard')
       else:
-        _log_error(f"ERROR: audio file {audio_file_path} not found\n")   
+        _log_error(f"ERROR: audio file {audio_file_path} not found")   
 
       # set this call handler to map to the new handler
       cn.set_dtmf_mapping(key, new_handler.get_id(), handler, is_to_number=False)
@@ -157,9 +160,10 @@ def set_after_hours_to_handler(handler:CallHandler, call_handlers, cn:CUCConnect
       handler_next_id = None
 
     if not handler_next_id:
-      _log_error(f"ERROR: error getting id of handler to transfer to for after hours on handler '{handler.Name}'\n")
+      _log_error(f"ERROR: error getting id of handler to transfer to for after hours on handler '{handler.Name}' trying to map to {mapping_parts[3]}")
     else:
       cn.set_closed_handler(handler_next_id, handler)
+      cn.enable_closed(handler)
 
 """
 assumptions:
@@ -172,8 +176,9 @@ def set_closed_greeting(handler:CallHandler, cn:CUCConnector, audio_path_name):
   audio_file_path = get_audio_file_path(audio_path_name, PATH_TO_AUDIO_FILES)
   if audio_file_path:
     cn.upload_greeting(audio_file_path, handler, 'Closed')
+    cn.enable_closed(handler)
   else:
-    _log_error(f"ERROR: audio file {audio_file_path} not found\n")   
+    _log_error(f"ERROR: audio file {audio_file_path} not found")   
 
 """
 assumptions:
@@ -183,6 +188,10 @@ assumptions:
 - reuse the operator extension of handler for the new handler.
 """
 def create_new_after_hours_handler(handler:CallHandler, cn:CUCConnector, call_handlers):
+
+  # TODO testnewafter hours wrong input dtmf 
+
+ # create the new handler
   name = remove_wav(handler.AfterHoursMainMenuCustomPromptFilename)
   new_handler = CallHandler()
   new_handler.Name = name
@@ -193,7 +202,11 @@ def create_new_after_hours_handler(handler:CallHandler, cn:CUCConnector, call_ha
   cn.create_handler_and_get_id(new_handler)
   call_handlers[new_handler.Name] = new_handler
 
-  set_business_hours_keys_and_transfer_rules(new_handler, cn, call_handlers)  
+  set_business_hours_keys_and_transfer_rules(new_handler, cn, call_handlers)
+
+  # set the current handler to go to the new handler on closed greeting
+  cn.set_closed_handler(new_handler.get_id(), handler)
+  cn.enable_closed(handler)
 
 
 def test():
@@ -204,7 +217,7 @@ def test():
   with open('config.json') as config_file:
     config = json.load(config_file)
 
-  FILE = "testclosed.csv"
+  FILE = config["autoAttendantsFile"]
   SERVER = config["server"]
   USERNAME = config["username"]
   PASSWORD = config["password"]
@@ -258,8 +271,8 @@ def main():
   print("setting business hours key mappings...")
   print("setting transfer rules...")
   print("uploading greetings...")
-  print("setting access numbers (pilot identifiers)...\n")
-  for handler in call_handlers.values():
+  print("setting access numbers (pilot identifiers)...\n") # error if dict changes size during iteration
+  for k, handler in list(call_handlers.items()):
     try:
       handler: CallHandler
 
@@ -275,7 +288,7 @@ def main():
         if audio_file_path:
           cn.upload_greeting(audio_file_path, handler, 'Standard')
         else:
-          _log_error(f"ERROR: audio file {audio_file_path} not found\n")
+          _log_error(f"ERROR: audio file {audio_file_path} not found")
 
       elif handler.BusinessHoursWelcomeGreetingFilename and handler.BusinessHoursWelcomeGreetingFilename not in INVALID_OPTIONS and not pd.isna(handler.BusinessHoursWelcomeGreetingFilename):
         target_filename = handler.BusinessHoursWelcomeGreetingFilename.lower()
@@ -284,7 +297,7 @@ def main():
         if audio_file_path:
           cn.upload_greeting(audio_file_path, handler, 'Standard')
         else:
-          _log_error(f"ERROR: audio file {audio_file_path} not found\n")
+          _log_error(f"ERROR: audio file {audio_file_path} not found")
 
       # set access number
       if handler.PilotIdentifierList and handler.PilotIdentifierList not in INVALID_OPTIONS and not pd.isna(handler.PilotIdentifierList):
@@ -304,8 +317,9 @@ def main():
       # case 2
       elif handler.AfterHoursMainMenuCustomPromptFilename and handler.AfterHoursMainMenuCustomPromptFilename not in INVALID_OPTIONS and handler.AfterHoursWelcomeGreetingFilename and handler.AfterHoursWelcomeGreetingFilename in INVALID_OPTIONS and (not handler.AfterHoursKeyMapping or handler.AfterHoursKeyMapping in INVALID_OPTIONS):
         set_closed_greeting(handler, cn, audio_path_name=handler.AfterHoursMainMenuCustomPromptFilename)
-      elif handler.AfterHoursMainMenuCustomPromptFilename and handler.AfterHoursMainMenuCustomPromptFilename in INVALID_OPTIONS and handler.AfterHoursWelcomeGreetingFilename and handler.AfterHoursWelcomeGreetingFilename not in INVALID_OPTIONS and (not handler.AfterHoursKeyMapping or handler.AfterHoursKeyMapping in INVALID_OPTIONS):
-        set_closed_greeting(handler, cn, audio_path_name=handler.AfterHoursWelcomeGreetingFilename)
+        
+      elif handler.AfterHoursMainMenuCustomPromptFilename and handler.AfterHoursMainMenuCustomPromptFilename in INVALID_OPTIONS and call_handlers.get(handler.AfterHoursMainMenuCustomPromptFilename) and handler.AfterHoursWelcomeGreetingFilename and handler.AfterHoursWelcomeGreetingFilename not in INVALID_OPTIONS and (not handler.AfterHoursKeyMapping or handler.AfterHoursKeyMapping in INVALID_OPTIONS):
+        set_closed_greeting(handler, cn, audio_path_name=handler.AfterHoursMainMenuCustomPromptFilename)
 
       # case 3
       elif handler.AfterHoursMainMenuCustomPromptFilename and handler.AfterHoursMainMenuCustomPromptFilename not in INVALID_OPTIONS and handler.AfterHoursKeyMapping and handler.AfterHoursKeyMapping not in INVALID_OPTIONS:
@@ -313,7 +327,7 @@ def main():
 
       # case 4
       elif handler.AfterHoursWelcomeGreetingFilename and handler.AfterHoursWelcomeGreetingFilename not in INVALID_OPTIONS and handler.AfterHoursMainMenuCustomPromptFilename and handler.AfterHoursMainMenuCustomPromptFilename not in INVALID_OPTIONS:
-        pass
+        _log_error(f"'{handler.Name}' after hours not configured: two recordings need to be concatenated.")
 
     except Exception as e:
       _log_error(f"Unexpected error while processing handler '{handler.Name}': {e}")
@@ -337,8 +351,5 @@ main program execution.
 if __name__ == "__main__":
   init_logs()
   print("starting program...")
-  try:
-    test()
-  except Exception as e:
-    _log_error(f"Fatal error in top-level execution: {e}")
+  main()
   print("done.")

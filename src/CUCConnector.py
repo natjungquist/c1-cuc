@@ -41,7 +41,7 @@ class CUCConnector:
     """
     def set_template_id(self, response_text):
         data = json.loads(response_text)
-        self.call_handler_template_id = data["CallhandlerPrimaryTemplate"]["ObjectId"]
+        self.call_handler_template_id = data["CallhandlerPrimaryTemplate"][0]["ObjectId"]
 
     """
     creates a standard call handler with no settings besides its name.
@@ -100,7 +100,7 @@ class CUCConnector:
         )
 
         if response.status_code == 204: 
-            _log_success(f"{handler.Name} set with key: {key} and mapping: {transfer_to}")
+            _log_success(f"'{handler.Name}' set with key: {key} and mapping: {transfer_to}")
         else:
             _log_error(f"ERROR: failed to set dtmf for handler '{handler.Name}' with key: {key} and mapping: {transfer_to}: {response.status_code} - {response.text}")
     
@@ -126,7 +126,7 @@ class CUCConnector:
         )
 
         if response.status_code == 204: 
-            _log_success(f"{handler.Name} transfer rule set")
+            _log_success(f"'{handler.Name}' transfer rule set")
         else:
             _log_error(f"ERROR: failed to set transfer rule for handler '{handler.Name}': {response.status_code} - {response.text}")
 
@@ -154,7 +154,7 @@ class CUCConnector:
             )
 
         if response.status_code == 204:
-            _log_success(f"'{handler.Name}' business hours main menu prompt uploaded")
+            _log_success(f"'{handler.Name}' greeting uploaded for {greeting_type}")
         else:
             _log_error(f"ERROR: failed to upload {file_path} for handler '{handler.Name}': {response.status_code} - {response.text}")
 
@@ -208,7 +208,8 @@ class CUCConnector:
             _log_error(f"ERROR: failed to set closed handler for handler '{handler.Name}': {response.status_code} - {response.text}")
 
     """
-    enable
+    enables the closed greeting.
+    Cisco API won't allow the greeting time to be set to be indefinite.
     """
     def enable_closed(self, handler:CallHandler):
         url = f"https://{self.server}/vmrest/handlers/callhandlers/{handler.get_id()}/greetings/Off%20Hours"

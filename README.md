@@ -19,12 +19,13 @@ A specific customer of C1 has requested a way to automate a way to bulk export c
    cd <repository-directory>
    ```
 
-2. **Install Python and pandas** (if not already installed)
+2. **Install Python, pandas, and requests** (if not already installed)
    - Install python at [python.org](https://www.python.org/downloads/)
         - This program was developed with python 3.11.4
    - Install dependencies:
      ```bash
      pip install pandas
+     pip install requests
      ```
    To run convert_wav_files.py, also install ffmpeg:
    - Download 7zip from: [7-zip.org](https://www.7-zip.org/download.html)
@@ -48,6 +49,10 @@ A specific customer of C1 has requested a way to automate a way to bulk export c
       "recordingsDirectory":""
    }
    ```
+## Run the Program
+- `main.py`
+## After Running the Program
+- errors will be logged to `error.log`
 
 
 ## Contact 
