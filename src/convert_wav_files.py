@@ -1,5 +1,6 @@
 # Utility program to convert all audio files in a specified directory to the specific 
 # format of .wav file that the CUC API expects to recieve.
+# Run this program from the c1-cuc/src directory.
 
 import ffmpeg
 import os
@@ -17,7 +18,7 @@ def convert_to_wav(input_path, output_path):
       .run(overwrite_output=True)
     )
   except ffmpeg.Error as e:
-    print("ffmpeg: " + e.stderr.decode())
+    print("ffmpeg error.")
 
 """
 converts all files to proper format
@@ -31,7 +32,7 @@ def convert_all_wav_files(source_dir):
 
   for filename in os.listdir(source_dir):
       input_path = os.path.join(source_dir, filename)
-      if os.path.isfile(input_path):
+      if os.path.isfile(input_path) and not input_path.endswith('.csv'):
           name, _ = os.path.splitext(filename)
           output_path = os.path.join(output_dir, name)
           convert_to_wav(input_path, output_path)
@@ -58,4 +59,5 @@ main program execution.
 if __name__ == "__main__":
   source_audio_dir = get_source_audio_directory()
   convert_all_wav_files(source_audio_dir)
-  print("WAV file processing complete.")
+  print("WAV file conversion complete.")
+  print("File type: RIFF (little-endian) data, WAVE audio, Microsoft PCM, 16 bit, mono 8000 Hz.")
