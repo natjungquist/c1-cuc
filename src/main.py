@@ -168,8 +168,8 @@ assumptions:
 - the .wav file exists
 - 
 """
-def set_closed_greeting(handler:CallHandler, cn:CUCConnector):
-  audio_file_path = get_audio_file_path(handler.AfterHoursMainMenuCustomPromptFilename, PATH_TO_AUDIO_FILES)
+def set_closed_greeting(handler:CallHandler, cn:CUCConnector, audio_path_name):
+  audio_file_path = get_audio_file_path(audio_path_name, PATH_TO_AUDIO_FILES)
   if audio_file_path:
     cn.upload_greeting(audio_file_path, handler, 'Closed')
   else:
@@ -183,7 +183,7 @@ assumptions:
 - reuse the operator extension of handler for the new handler.
 """
 def create_new_after_hours_handler(handler:CallHandler, cn:CUCConnector, call_handlers):
-  name = remove_wav(handler.AfterHoursWelcomeGreetingFilename)
+  name = remove_wav(handler.AfterHoursMainMenuCustomPromptFilename)
   new_handler = CallHandler()
   new_handler.Name = name
   new_handler.BusinessHoursKeyMapping = handler.AfterHoursKeyMapping
@@ -291,18 +291,20 @@ def main():
 
     # configure settings for after hours
     # after hours cases:
-    # - 1. main menu prompt is null. key is a dash that goes to another handler. interpret this as timeout -> go to handler. assume handler already exists. (157-umaa-02-main_spanish)
-    # - 2. main menu prompt has a filename. no key mappings. play a closed greeting. (283-umaa-02-main_spanish)
+    # - 1. main menu prompt is null. key is a dash that goes to another handler. interpret this as timeout -> go to handler. assume handler already exists. (157-umaa-02-main_spanish) (283-umaa-02-main_spanish)
+    # - 2. main menu prompt has a filename. no key mappings. play a closed greeting. (283-UMAA-02-Main_Spanish)
     # - 3. main menu prompt has a filename. yes key mappings. create a new handler if it doesnt already exist with this filename. set greeting. set mappings. (311-UMAA-01-Main_Spanish has lewisnightmainspanish.wav)
-    # - 4. both greeting and main menu have filenames. means it is playing two wav files back to back. but this is not possible in unity. so I will ignore this for now. (316-umaa-05-admin_spanish) 
+    # - 4. both greeting and main menu have filenames. means it is playing two wav files back to back. but this is not possible in unity. so I will ignore this for now. (316-umaa-05-admin_spanish) (367-UMAA-03-Nurse-English)
     
     # case 1
     if (not handler.AfterHoursMainMenuCustomPromptFilename or handler.AfterHoursMainMenuCustomPromptFilename in INVALID_OPTIONS and handler.AfterHoursKeyMapping) and handler.AfterHoursKeyMapping and handler.AfterHoursKeyMapping not in INVALID_OPTIONS:
       set_after_hours_to_handler(handler, call_handlers, cn)
 
     # case 2
-    elif handler.AfterHoursMainMenuCustomPromptFilename and handler.AfterHoursMainMenuCustomPromptFilename not in INVALID_OPTIONS and (not handler.AfterHoursKeyMapping or handler.AfterHoursKeyMapping in INVALID_OPTIONS):
-      set_closed_greeting(handler, cn)
+    elif handler.AfterHoursMainMenuCustomPromptFilename and handler.AfterHoursMainMenuCustomPromptFilename not in INVALID_OPTIONS and handler.AfterHoursWelcomeGreetingFilename and handler.AfterHoursWelcomeGreetingFilename in INVALID_OPTIONS and (not handler.AfterHoursKeyMapping or handler.AfterHoursKeyMapping in INVALID_OPTIONS):
+      set_closed_greeting(handler, cn, audio_path_name=handler.AfterHoursMainMenuCustomPromptFilename)
+    elif handler.AfterHoursMainMenuCustomPromptFilename and handler.AfterHoursMainMenuCustomPromptFilename in INVALID_OPTIONS and handler.AfterHoursWelcomeGreetingFilename and handler.AfterHoursWelcomeGreetingFilename not in INVALID_OPTIONS and (not handler.AfterHoursKeyMapping or handler.AfterHoursKeyMapping in INVALID_OPTIONS):
+      set_closed_greeting(handler, cn, audio_path_name=handler.AfterHoursWelcomeGreetingFilename)
 
     # case 3
     elif handler.AfterHoursMainMenuCustomPromptFilename and handler.AfterHoursMainMenuCustomPromptFilename not in INVALID_OPTIONS and handler.AfterHoursKeyMapping and handler.AfterHoursKeyMapping not in INVALID_OPTIONS:
