@@ -10,6 +10,7 @@ import pandas as pd
 import json
 import os
 import urllib3
+from util import _log_error, _log_success
 
 PATH_TO_AUDIO_FILES = os.path.join(os.getcwd(), "converted_wav_files") 
     
@@ -58,7 +59,7 @@ def set_business_hours_keys_and_transfer_rules(handler:CallHandler, cn:CUCConnec
   for mapping in mapping_list:
     mapping_parts = mapping.split(',')
     if len(mapping_parts) < 4:
-      print(f"ERROR: mapping parts invalid. Could not set business hours key mappings for '{handler.Name}'")
+      _log_error(f"ERROR: mapping parts invalid. Could not set business hours key mappings for '{handler.Name}'")
 
     transfer_to = None
     key = mapping_parts[0].strip()
@@ -78,7 +79,7 @@ def set_business_hours_keys_and_transfer_rules(handler:CallHandler, cn:CUCConnec
         else: #not a dash, set mapping
           cn.set_dtmf_mapping(key, transfer_to, handler, is_to_number=True)
       else:
-        print(f"ERROR: could not make 9-digit key mapping for handler '{handler.Name}'\n")
+        _log_error(f"ERROR: could not make 9-digit key mapping for handler '{handler.Name}'\n")
 
     # option 2. go to another call handler that already exists
     elif (mapping_parts[3] not in INVALID_OPTIONS):
@@ -91,7 +92,7 @@ def set_business_hours_keys_and_transfer_rules(handler:CallHandler, cn:CUCConnec
         handler_next_id = None
 
       if not handler_next_id:
-        print(f"ERROR: error getting id of handler to transfer to\n")
+        _log_error(f"ERROR: error getting id of handler to transfer to\n")
       else:
         cn.set_dtmf_mapping(key, transfer_to, handler, is_to_number=False)
 
@@ -109,7 +110,7 @@ def set_business_hours_keys_and_transfer_rules(handler:CallHandler, cn:CUCConnec
       if audio_file_path:
         cn.upload_greeting(audio_file_path, new_handler, 'Standard')
       else:
-        print(f"ERROR: audio file {audio_file_path} not found\n")   
+        _log_error(f"ERROR: audio file {audio_file_path} not found\n")   
 
       # set this call handler to map to the new handler
       cn.set_dtmf_mapping(key, new_handler.get_id(), handler, is_to_number=False)
@@ -144,7 +145,7 @@ assumptions:
 def set_after_hours_to_handler(handler:CallHandler, call_handlers, cn:CUCConnector):
   mapping_parts = handler.AfterHoursKeyMapping.split(',')
   if len(mapping_parts) < 3:
-    print(f"ERROR: mapping parts invalid for after hours key mapping on handler '{handler.Name}'")
+    _log_error(f"ERROR: mapping parts invalid for after hours key mapping on handler '{handler.Name}'")
 
   if mapping_parts[3] not in INVALID_OPTIONS:
     transfer_to = mapping_parts[3]
@@ -156,7 +157,7 @@ def set_after_hours_to_handler(handler:CallHandler, call_handlers, cn:CUCConnect
       handler_next_id = None
 
     if not handler_next_id:
-      print(f"ERROR: error getting id of handler to transfer to for after hours on handler '{handler.Name}'\n")
+      _log_error(f"ERROR: error getting id of handler to transfer to for after hours on handler '{handler.Name}'\n")
     else:
       cn.set_closed_handler(handler_next_id, handler)
 
@@ -209,7 +210,7 @@ def test():
 
 
 def main():
-  urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+  urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning) # set this because the server is an insecure IP not a regular domain
 
   # load in config items
   print("loading in config...\n")
@@ -253,7 +254,7 @@ def main():
       if audio_file_path:
         cn.upload_greeting(audio_file_path, handler, 'Standard')
       else:
-        print(f"ERROR: audio file {audio_file_path} not found\n")
+        _log_error(f"ERROR: audio file {audio_file_path} not found\n")
 
     elif handler.BusinessHoursWelcomeGreetingFilename and handler.BusinessHoursWelcomeGreetingFilename not in INVALID_OPTIONS and not pd.isna(handler.BusinessHoursWelcomeGreetingFilename):
       target_filename = handler.BusinessHoursWelcomeGreetingFilename.lower()
@@ -262,7 +263,7 @@ def main():
       if audio_file_path:
         cn.upload_greeting(audio_file_path, handler, 'Standard')
       else:
-        print(f"ERROR: audio file {audio_file_path} not found\n")
+        _log_error(f"ERROR: audio file {audio_file_path} not found\n")
 
     # set access number
     if handler.PilotIdentifierList and handler.PilotIdentifierList not in INVALID_OPTIONS and not pd.isna(handler.PilotIdentifierList):
@@ -281,11 +282,11 @@ def main():
 
     # case 2
     elif handler.AfterHoursMainMenuCustomPromptFilename and handler.AfterHoursMainMenuCustomPromptFilename not in INVALID_OPTIONS and (not handler.AfterHoursKeyMapping or handler.AfterHoursKeyMapping in INVALID_OPTIONS):
-      pass
+      set_closed_greeting(handler)
 
     # case 3
     elif handler.AfterHoursMainMenuCustomPromptFilename and handler.AfterHoursMainMenuCustomPromptFilename not in INVALID_OPTIONS and handler.AfterHoursKeyMapping and handler.AfterHoursKeyMapping not in INVALID_OPTIONS:
-      pass
+      create_new_after_hours_handler(handler)
 
     # case 4
     elif handler.AfterHoursWelcomeGreetingFilename and handler.AfterHoursWelcomeGreetingFilename not in INVALID_OPTIONS and handler.AfterHoursMainMenuCustomPromptFilename and handler.AfterHoursMainMenuCustomPromptFilename not in INVALID_OPTIONS:
@@ -306,4 +307,6 @@ def main():
 main program execution.
 """
 if __name__ == "__main__":
+  print("starting program...")
   test()
+  print("done.")

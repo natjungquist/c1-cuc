@@ -1,0 +1,6 @@
+LOC#,Site,Name,PilotIdentifierList,OperatorExtension,BusinessHoursWelcomeGreetingFilename,BusinessHoursMainMenuCustomPromptFilename,BusinessHoursKeyMapping,BusinessHoursKeyMappingEnabled,AfterHoursWelcomeGreetingFilename,AfterHoursMainMenuCustomPromptFilename,AfterHoursKeyMapping,AfterHoursKeyMappingEnabled
+023, Barnard El,023-UMAA-03-Main_English_Night,0,800236010,silence.wav,023-UMAA-01-English_Main_16bit_mono.wav,"1,Spanish,,023-UMAA-04-Main_Spanish_Night,,,,,,; 2,Attendance,800233011,,,,,,,; 3,Nurse,800233050,,,,,,,",TRUE,silence.wav,0,0,FALSE
+023, Barnard El,023-UMAA-04-Main_Spanish_Night,0,800236010,silence.wav,023-UMAA-02-Spanish_Main_16bit_mono.wav,"2,Attendance,800233011,,,,,,,; 3,Nurse,800233050,,,,,,,",TRUE,silence.wav,0,0,FALSE
+023, Barnard El,023-UMAA-02-Main_Spanish,0,800236010,silence.wav,023-UMAA-02-Spanish_Main_16bit_mono.wav,"2,Attendance,800233011,,,,,,,; 3,Nurse,800233050,,,,,,,; -,Front Office (Operator),800236010,,,,,,,",,silence.wav,silence.wav,"-,Closed Auto Attendant,,023-UMAA-04-Main_Spanish_Night,,,,,,",TRUE
+023, Barnard El,023-UMAA-01-Main-English,800233000,800233012,silence2.wav,023-UMAA-01-Main-English-2022.wav,"1,Attendance,800233011,,,,,,,; -,Operator,800233012,,,,,,,",TRUE,silence2.wav,0,0,FALSE
+

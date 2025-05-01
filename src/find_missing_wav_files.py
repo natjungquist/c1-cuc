@@ -8,6 +8,7 @@ import pandas as pd
 import json
 import os
 import sys
+from util import _log_to_file
 
 INVALID_OPTIONS = ["0", 0, "silence.wav", "silence2.wav", '']
 
@@ -40,20 +41,6 @@ def get_audio_file_path(target_filename, path_to_audio_files):
         return file_path[:-4]
 
   return None
-    
-"""
-writes a missing audio filename to a log file.
-
-args:
-    filename: The name of the log file to write to.
-    transfer_target: The identifier (e.g., transfer_to) associated with the missing file.
-"""
-def _log_to_file(filename: str, info_to_write: str):
-    try:
-        with open(filename, "a") as log_file:
-            log_file.write(f"{info_to_write}\n")
-    except Exception as e:
-        print(f"ERROR: could not write to log file '{filename}': {e}\n")
 
 """
 Asks the user for the filename they want to log the missing wav files to.

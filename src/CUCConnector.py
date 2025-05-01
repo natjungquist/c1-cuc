@@ -4,6 +4,7 @@
 import requests
 import json
 from CallHandler import CallHandler
+from util import _log_success, _log_error
 
 class CUCConnector:
 
@@ -33,7 +34,7 @@ class CUCConnector:
             self.set_template_id(response.text)
             
         else:
-            print(f"ERROR: failed to get template object id: {response.status_code} - {response.text}")
+            _log_error(f"ERROR: failed to get template object id: {response.status_code} - {response.text}")
 
     """
     sets template id of call handler objects at this server. 
@@ -41,7 +42,6 @@ class CUCConnector:
     def set_template_id(self, response_text):
         data = json.loads(response_text)
         self.call_handler_template_id = data["CallhandlerPrimaryTemplate"]["ObjectId"]
-        # print(self.call_handler_template_id)
 
     """
     creates a standard call handler with no settings besides its name.
@@ -63,11 +63,11 @@ class CUCConnector:
                                  data=payload,verify=False)
 
         if response.status_code == 201: 
-            print(f"'{handler.Name}' created: {response.text}")
+            _log_success(f"'{handler.Name}' created: {response.text}")
             parts = response.text.split('/')
             handler.UnityId = parts[-1]
         else:
-            print(f"ERROR: failed to create call handler: {response.status_code} - {response.text}")
+            _log_error(f"ERROR: failed to create call handler: {response.status_code} - {response.text}")
     
     """
     sets one key of a specified call handler to go to either a specified number or another call handler.
@@ -100,9 +100,9 @@ class CUCConnector:
         )
 
         if response.status_code == 204: 
-            print(f"{handler.Name} set with key: {key} and mapping: {transfer_to}")
+            _log_success(f"{handler.Name} set with key: {key} and mapping: {transfer_to}")
         else:
-            print(f"ERROR: failed to set dtmf for handler '{handler.Name}' with key: {key} and mapping: {transfer_to}: {response.status_code} - {response.text}")
+            _log_error(f"ERROR: failed to set dtmf for handler '{handler.Name}' with key: {key} and mapping: {transfer_to}: {response.status_code} - {response.text}")
     
     """
     sets a standard transfer rule for a specified call handler.
@@ -126,9 +126,9 @@ class CUCConnector:
         )
 
         if response.status_code == 204: 
-            print(f"{handler.Name} transfer rule set")
+            _log_success(f"{handler.Name} transfer rule set")
         else:
-            print(f"ERROR: failed to set transfer rule for handler '{handler.Name}': {response.status_code} - {response.text}")
+            _log_error(f"ERROR: failed to set transfer rule for handler '{handler.Name}': {response.status_code} - {response.text}")
 
     """
     uploads an audio file to be the greeting of a call handler.
@@ -139,6 +139,9 @@ class CUCConnector:
         greeting_type: a string 'Standard' or 'Closed'
     """
     def upload_greeting(self, file_path, handler:CallHandler, greeting_type):
+        if greeting_type.lower() == 'closed':
+            greeting_type = "Off%20Hours"
+
         url = f"https://{self.server}/vmrest/handlers/callhandlers/{handler.get_id()}/greetings/{greeting_type}/greetingstreamfiles/1033/audio"
         headers = {
             "Content-Type":"audio/wav",
@@ -151,9 +154,9 @@ class CUCConnector:
             )
 
         if response.status_code == 204:
-            print(f"'{handler.Name}' business hours main menu prompt uploaded")
+            _log_success(f"'{handler.Name}' business hours main menu prompt uploaded")
         else:
-            print(f"ERROR: failed to upload {file_path} for handler '{handler.Name}': {response.status_code} - {response.text}")
+            _log_error(f"ERROR: failed to upload {file_path} for handler '{handler.Name}': {response.status_code} - {response.text}")
 
     """
     sets the dmfm access id for a specified call handler.
@@ -175,11 +178,11 @@ class CUCConnector:
         ) 
 
         if response.status_code == 204: 
-            print(f"{handler.Name} DTMFAccessId set with {handler.PilotIdentifierList}")
+            _log_success(f"{handler.Name} DTMFAccessId set with {handler.PilotIdentifierList}")
         elif response.status_code == 400 and "Duplicate" in response.text:
-            print(f"ERROR: '{handler.Name}' DTMF access ID not set because another handler is already assigned to it.")
+            _log_error(f"ERROR: '{handler.Name}' DTMF access ID not set because another handler is already assigned to it.")
         else:
-            print(f"ERROR: failed to set DTMFAccessId for '{handler.Name}': {response.status_code} - {response.text}")
+            _log_error(f"ERROR: failed to set DTMFAccessId for '{handler.Name}': {response.status_code} - {response.text}")
     
 
     """
@@ -200,9 +203,9 @@ class CUCConnector:
         )
 
         if response.status_code == 204:
-            print(f"'{handler.Name}' closed handler set")
+            _log_success(f"'{handler.Name}' closed handler set")
         else:
-            print(f"ERROR: failed to set closed handler for handler '{handler.Name}': {response.status_code} - {response.text}")
+            _log_error(f"ERROR: failed to set closed handler for handler '{handler.Name}': {response.status_code} - {response.text}")
 
     """
     enable
@@ -222,9 +225,9 @@ class CUCConnector:
         )
 
         if response.status_code == 204:
-            print(f"'{handler.Name}' closed greeting enabled")
+            _log_success(f"'{handler.Name}' closed greeting enabled")
         else:
-            print(f"ERROR: failed to enable closed greeting for handler '{handler.Name}': {response.status_code} - {response.text}")
+            _log_error(f"ERROR: failed to enable closed greeting for handler '{handler.Name}': {response.status_code} - {response.text}")
 
     """
     """
