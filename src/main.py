@@ -342,5 +342,5 @@ main program execution.
 if __name__ == "__main__":
   init_logs()
   print("starting program...")
-  test()
+  main()
   print("done.")

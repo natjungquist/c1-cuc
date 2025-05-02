@@ -466,8 +466,6 @@ Option 4 ,#N/A,Option 4 - English,0,0,silence.wav,Option 4.wav,"1,Admin Assist,3
 329, Wilson Mdl,329-UMAA-05-counselor-Spanish,0,0,silence.wav,329-UMAA-02-Counselor-Spanish-2020.wav,"1,Counselor 1,2170,,,,,,,; 2,Counselor 2,2256,,,,,,,; 3,Counselor 3,2117,,,,,,,; 4,Counselor 4,2165,,,,,,,; 5,Counselor 5,2351,,,,,,,",TRUE,silence.wav,silence.wav,0,FALSE
 329, Wilson Mdl,329-UMAA-06-Parent.L-English,0,0,silence.wav,329-UMAA-06-Parent-English.wav,"1,Parent Liason 1,2165,,,,,,,; 2,Parent Liason 2,2351,,,,,,,",TRUE,silence.wav,silence.wav,0,FALSE
 329, Wilson Mdl,329-UMAA-06-Parent.L-Spanish,0,0,silence.wav,329-UMAA-06-Parent-Spanish.wav,"1,Parent Liason 1,2165,,,,,,,; 2,Parent Liason 2,2351,,,,,,,",TRUE,silence.wav,silence.wav,0,FALSE
-021, Bay Park El,021-UMAA-01-Main_English,3000,3021,silence.wav,021-UMAA-01-Main-English-2021.wav,"2,AttendanceAndSchoolRecords,3021,,,,,,,; 3,HealthOffice,3050,,,,,,,; 4,SchoolCounselor,3062,,,,,,,; 5,Cafeteria,3060,,,,,,,; 6,PrincipalSecretary,3020,,,,,,,; -,Operator,3021,,,,,,,",TRUE,silence.wav,0,0,FALSE
-021, Bay Park El,021-UMAA-01-Main_Spanish,0,3021,silence.wav,0,"2,Attendance,3021,,,,,,,; 3,HealthOffice,3050,,,,,,,; 4,SchoolCounselor,3062,,,,,,,; 5,Cafeteria,3060,,,,,,,; 6,PrincipalSecretary,3020,,,,,,,; -,Operator,3021,,,,,,,",TRUE,silence.wav,0,0,FALSE
 139, Hardy El,139-UMAA-01-Main_Spanish,0,3021,silence.wav,0,"2,Attendant,3021,,,,,,,; 3,OfficeClerk,3021,,,,,,,; 4,HealthOffice,3050,,,,,,,; 5,PrincipalSecretary,3020,,,,,,,; -,Operator,3021,,,,,,,",TRUE,silence.wav,0,0,FALSE
 139, Hardy El,139-UMAA-01-Main_English,3000,3021,silence.wav,Hardy Phone Tree 2024.wav,"1,Attendance,3021,,,,,,,; 2,Health Office,3051,,,,,,,",TRUE,silence.wav,0,0,FALSE
 503, BECA,503-UMAA-01-Main_Spanish,0,3020,silence.wav,Auto Attendant Spanish.wav,"1,PricipalSecretary,3020,,,,,,,; 2,Attendance,3021,,,,,,,; 3,Enrollment,3020,,,,,,,; 4,Counselor,3055,,,,,,,; 5,ResourceSpecialist,2201,,,,,,,; -,Operator,3020,,,,,,,",TRUE,silence.wav,0,0,FALSE
@@ -507,8 +505,6 @@ Option 4 ,#N/A,Option 4 - English,0,0,silence.wav,Option 4.wav,"1,Admin Assist,3
 269, Sunset View El,269-UMAA-01-Main_Spanish,0,3021,silence.wav,0,"1,Operator,3021,,,,,,,",TRUE,silence.wav,0,0,FALSE
 169, La Jolla El,169-UMAA-01-Main_Spanish,0,3021,silence.wav,0,"2,Attendance,3005,,,,,,,; 3,Health Office,3050,,,,,,,; 4,Principal Secretary,3004,,,,,,,; -,Operator,801696003,,,,,,,",FALSE,silence.wav,0,0,FALSE
 169, La Jolla El,169-UMAA-01-Main_English,3000,801696003,silence.wav,LaJollaES-Main-Voice.wav,"2,Attendance,3005,,,,,,,; 3,Health Office,3050,,,,,,,; 4,Principal Secretary,3004,,,,,,,; -,Operator,801696003,,,,,,,",TRUE,silence.wav,0,0,FALSE
-029, Bird Rock El,029-UMAA-01-Main_Spanish,0,3021,silence.wav,0,"-,Operator,3021,,,,,,,",TRUE,silence.wav,0,0,FALSE
-029, Bird Rock El,029-UMAA-01-Main_English,3000,3020,silence.wav,029-UMAA-01-Main-English-2021.wav,"2,Attendance,3020,,,,,,,; 3,CustodialBSS,3065,,,,,,,; 4,HealthOffice,3050,,,,,,,; 5,PrincipalSecretary,3021,,,,,,,; -,Operator,3020,,,,,,,",TRUE,silence.wav,0,0,FALSE
 143, Hearst El,143-UMAA-01-Main_English,3000,3021,silence.wav,Hearst-Main-9-30.wav,"2,Attendence,3020,,,,,,,; 3,PrincipalSecretary,3021,,,,,,,; 4,HealthOffice,3050,,,,,,,; -,Operator,3020,,,,,,,",TRUE,silence.wav,0,0,FALSE
 143, Hearst El,143-UMAA-01-Main_Spanish,0,3021,silence.wav,0,"-,Operator,3021,,,,,,,",TRUE,silence.wav,0,0,FALSE
 271,#N/A,271-UMAA-01-Main_English,802713000,0,KavodAA.wav,Silence_1-Second-0001.wav,0,FALSE,0,0,0,FALSE
