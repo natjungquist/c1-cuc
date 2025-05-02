@@ -217,11 +217,14 @@ def test():
   USERNAME = config["username"]
   PASSWORD = config["password"]
   cn = CUCConnector(SERVER, USERNAME, PASSWORD)
+  cn.get_template_id()
 
-  test_handler_id = "5beaa35f-e51b-40bc-9b57-43f8297a6d45" # '023-UMAA-03-Main_English_Night'
+  test_handler_id = "c89f4758-db2f-44fc-bcf3-08fc102d5db9"
   test = CallHandler()
   test.UnityId = test_handler_id
-  
+
+  cn.set_standard_after_greeting_action(test)
+
 
 
 
@@ -264,6 +267,9 @@ def main():
       # set businss hours key mappings and transfer rules
       if handler.BusinessHoursKeyMapping and handler.BusinessHoursKeyMapping not in INVALID_OPTIONS and not pd.isna(handler.BusinessHoursKeyMapping):
         set_business_hours_keys_and_transfer_rules(handler, cn, call_handlers)
+
+      # set after greeting action to go loop back on itself
+      cn.set_standard_after_greeting_action(handler)
 
       # set business hours audio file greeting
       if handler.BusinessHoursMainMenuCustomPromptFilename and handler.BusinessHoursMainMenuCustomPromptFilename not in INVALID_OPTIONS and not pd.isna(handler.BusinessHoursMainMenuCustomPromptFilename):

@@ -5,6 +5,7 @@ import requests
 import json
 from CallHandler import CallHandler
 from util import _log_success, _log_error
+from find_missing_wav_files import INVALID_OPTIONS
 
 class CUCConnector:
 
@@ -41,14 +42,21 @@ class CUCConnector:
     """
     def set_template_id(self, response_text):
         data = json.loads(response_text)
-        self.call_handler_template_id = data["CallhandlerPrimaryTemplate"][0]["ObjectId"]
+        self.call_handler_template_id = data["CallhandlerPrimaryTemplate"][0]["ObjectId"] # the first template (index 0) listed is the SDUSD_Template defined already in CUC server
 
     """
     creates a standard call handler with no settings besides its name.
     handler object must already have a name. 
     records the new handler's id and saves it to the handler object.
+
+    args:
+        - handler: CallHandler object. Must have a defined Name.
     """
     def create_handler_and_get_id(self, handler:CallHandler):
+        if not handler.Name:
+            _log_error(f"ERROR: failed to create call handler because its name was not defined.")
+            return
+
         url = f"https://{self.server}/vmrest/handlers/callhandlers?templateObjectId={self.call_handler_template_id}"
 
         payload = json.dumps({
@@ -81,8 +89,23 @@ class CUCConnector:
     - Directory handlers
     - Interview handlers
 
+    args:
+        - handler: CallHandler object. Must have a defined ID.
+        - key: string representing key to press.
+        - transfer_to: string representing 9 digit number to transfer to or the id of another call handler.
+        - is_to_number: boolean. True if this mapping goes to a number. False if it goes to another handler.
     """
     def set_dtmf_mapping(self, key, transfer_to, handler:CallHandler, is_to_number):
+        if not handler.get_id() or handler.get_id() in INVALID_OPTIONS:
+            _log_error(f"ERROR: cannot set DTMF mapping for '{handler.Name}' because handler's ID is not defined.")
+            return
+        if not key:
+            _log_error(f"ERROR: cannot set DTMF mapping for '{handler.Name}' because key is not defined.")
+            return
+        if not transfer_to:
+            _log_error(f"ERROR: cannot set DTMF mapping for '{handler.Name}' because value to map to on key {key} is not defined.")
+            return
+
         url = f"https://{self.server}/vmrest/handlers/callhandlers/{handler.get_id()}/menuentries/{key}"
 
         if is_to_number:
@@ -106,8 +129,18 @@ class CUCConnector:
     
     """
     sets a standard transfer rule for a specified call handler.
+
+    args:
+        - handler: CallHandler object. Must have a defined ID and transfer rule extension.
     """
     def set_standard_transfer_rule_to_extension(self, handler:CallHandler):
+        if not handler.get_id() or handler.get_id() in INVALID_OPTIONS:
+            _log_error(f"ERROR: cannot set standard transfer rule for '{handler.Name}' because handler's ID is not defined.")
+            return
+        if not handler.transfer_rule_extension:
+            _log_error(f"ERROR: cannot set standard transfer rule for '{handler.Name}' because extension is not defined.")
+            return
+
         url = f"https://{self.server}/vmrest/handlers/callhandlers/{handler.get_id()}/transferoptions/Standard"
 
         payload = json.dumps({
@@ -136,9 +169,14 @@ class CUCConnector:
     audio file must be RIFF (little-endian) data, WAVE audio, PCM, 16 bit, mono 8000 Hz.
 
     args:
-        greeting_type: a string 'Standard' or 'Closed'
+        - handler: CallHandler object. Must have a defined ID.
+        - greeting_type: a string 'Standard' or 'Closed'
     """
     def upload_greeting(self, file_path, handler:CallHandler, greeting_type):
+        if not handler.get_id() or handler.get_id() in INVALID_OPTIONS:
+            _log_error(f"ERROR: cannot upload {greeting_type} greeting for '{handler.Name}' because handler's ID is not defined.")
+            return
+
         if greeting_type.lower() == 'closed':
             greeting_type = "Off%20Hours"
 
@@ -162,8 +200,15 @@ class CUCConnector:
     sets the dmfm access id for a specified call handler.
     the handler object must already contain a pilot identifer number.
     equivalent to the pilot identifier in exchange UM.
+
+    args:
+        - handler: CallHandler object. Must have a defined PilotIdentifierList.
     """
     def set_dtmf_access_id(self, handler:CallHandler):
+        if not handler.PilotIdentifierList or handler.PilotIdentifierList in INVALID_OPTIONS:
+            _log_error(f"ERROR: cannot set pilot identifier for '{handler.Name}' because it is not defined.")
+            return
+
         url = f"https://{self.server}/vmrest/handlers/callhandlers/{handler.get_id()}"
         payload =json.dumps({
             "DtmfAccessId": handler.PilotIdentifierList
@@ -206,3 +251,32 @@ class CUCConnector:
             _log_success(f"'{handler.Name}' closed handler set")
         else:
             _log_error(f"ERROR: failed to set closed handler for handler '{handler.Name}': {response.status_code} - {response.text}")
+
+    """
+    sets the after greeting action to go to 
+
+    args:
+        - handler: CallHandler object. Must have a defined ID.
+    """
+    def set_standard_after_greeting_action(self, handler:CallHandler):
+        if not handler.get_id() or handler.get_id() in INVALID_OPTIONS:
+            _log_error(f"ERROR: cannot set after greeting action for '{handler.Name}' because handler's ID is not defined.")
+            return
+
+        url = f"https://{self.server}/vmrest/handlers/callhandlers/{handler.get_id()}/greetings/Standard"
+        headers = {
+            "Content-Type":"application/json",
+            "Accept":"application/json",
+        }
+        data = json.dumps({
+            "AfterGreetingAction": "2",
+            "AfterGreetingTargetHandlerObjectId": handler.get_id(),
+            "AfterGreetingTargetConversation": "PHTransfer"
+        })
+
+        response = requests.put(url, headers = headers, auth = (self.username, self.password), data = data, verify=False)
+
+        if response.status_code == 204:
+            _log_success(f"'{handler.Name}' after greeting action set")
+        else:
+            _log_error(f"ERROR: failed to set after greeting action for handler '{handler.Name}': {response.status_code} - {response.text}")
