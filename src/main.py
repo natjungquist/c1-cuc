@@ -54,7 +54,13 @@ specifications:
 def set_business_hours_keys_and_transfer_rules(handler:CallHandler, cn:CUCConnector, call_handlers):
   # operator mapping
   if handler.OperatorExtension and handler.OperatorExtension not in INVALID_OPTIONS and not pd.isna(handler.OperatorExtension):
-    cn.set_dtmf_mapping("0", handler.OperatorExtension, handler, is_to_number=True)
+    operator_string = str(handler.OperatorExtension)
+    if len(operator_string) < 9:
+      operator_final = get_full_number(operator_string, handler)
+      if len(operator_final) == 9:
+        cn.set_dtmf_mapping("0", operator_final, handler, is_to_number=True)
+      else:
+        _log_error(f"ERROR: could not set key 0 to operator on handler '{handler.Name}' due to error parsing 9 digit number.")
 
   # other mappings
   mapping_list = handler.BusinessHoursKeyMapping.split(';')
