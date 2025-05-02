@@ -163,7 +163,6 @@ def set_after_hours_to_handler(handler:CallHandler, call_handlers, cn:CUCConnect
       _log_error(f"ERROR: error getting id of handler to transfer to for after hours on handler '{handler.Name}' trying to map to {mapping_parts[3]}")
     else:
       cn.set_closed_handler(handler_next_id, handler)
-      cn.enable_closed(handler)
 
 """
 assumptions:
@@ -176,7 +175,6 @@ def set_closed_greeting(handler:CallHandler, cn:CUCConnector, audio_path_name):
   audio_file_path = get_audio_file_path(audio_path_name, PATH_TO_AUDIO_FILES)
   if audio_file_path:
     cn.upload_greeting(audio_file_path, handler, 'Closed')
-    cn.enable_closed(handler)
   else:
     _log_error(f"ERROR: audio file {audio_path_name} not found for '{handler.Name}' Closed greeting")   
 
@@ -205,7 +203,6 @@ def create_new_after_hours_handler(handler:CallHandler, cn:CUCConnector, call_ha
 
   # set the current handler to go to the new handler on closed greeting
   cn.set_closed_handler(new_handler.get_id(), handler)
-  cn.enable_closed(handler)
 
 
 def test():
@@ -216,28 +213,16 @@ def test():
   with open('config.json') as config_file:
     config = json.load(config_file)
 
-  FILE = config["autoAttendantsFile"]
   SERVER = config["server"]
   USERNAME = config["username"]
   PASSWORD = config["password"]
   cn = CUCConnector(SERVER, USERNAME, PASSWORD)
-  cn.get_template_id()
 
-  # set info for all handlers
-  call_handlers = {} #key: name, value:handler
-
-  df = pd.read_csv(FILE)
-
-  print("creating handlers...\n")
-  for index, row in df.iterrows():
-      handler = CallHandler(row)
-      cn.create_handler_and_get_id(handler) # create it
-      call_handlers[handler.Name] = handler # add it to the dictionary of all handlers
+  test_handler_id = "5beaa35f-e51b-40bc-9b57-43f8297a6d45" # '023-UMAA-03-Main_English_Night'
+  test = CallHandler()
+  test.UnityId = test_handler_id
   
-  for handler in call_handlers.values():
-    handler: CallHandler
 
-    cn.enable_closed(handler)
 
 
 
@@ -339,11 +324,8 @@ def main():
 
   
 
-# TODO other conf might need to be done manually
-# TODO: set schedules
-# is there anything to set for settings during the greeting. allow them to record message after prompt??
-# times to reprompt caller?
-# after greeting take message?
+
+# TODO: maybe -- times to reprompt caller?
 
 
 
@@ -354,5 +336,5 @@ main program execution.
 if __name__ == "__main__":
   init_logs()
   print("starting program...")
-  main()
+  test()
   print("done.")

@@ -206,32 +206,3 @@ class CUCConnector:
             _log_success(f"'{handler.Name}' closed handler set")
         else:
             _log_error(f"ERROR: failed to set closed handler for handler '{handler.Name}': {response.status_code} - {response.text}")
-
-    """
-    enables the closed greeting.
-    Cisco API won't allow the greeting time to be set to be indefinite.
-    """
-    def enable_closed(self, handler:CallHandler):
-        url = f"https://{self.server}/vmrest/handlers/callhandlers/{handler.get_id()}/greetings/Off%20Hours"
-        
-        payload = f"<Greeting>\r\n  <Enabled>true</Enabled>\r\n  <TimeExpires>2029-01-01 05:30:00.0</TimeExpires> \r\n</Greeting>"
-
-        headers = {
-            'Accept': 'application/xml',
-            'Content-Type': 'application/xml'
-        }
-
-        response = requests.put(url, headers=headers, auth = (self.username, self.password),
-            data=payload, verify=False
-        )
-
-        if response.status_code == 204:
-            _log_success(f"'{handler.Name}' closed greeting enabled")
-        else:
-            _log_error(f"ERROR: failed to enable closed greeting for handler '{handler.Name}': {response.status_code} - {response.text}")
-
-    """
-    """
-    def set_schedule(self, handler:CallHandler):
-        url = f"https://{self.server}/vmrest/handlers/callhandlers/{handler.get_id()}/"
-        pass
