@@ -62,7 +62,7 @@ def set_business_hours_keys_and_transfer_rules(handler:CallHandler, cn:CUCConnec
   for mapping in mapping_list:
     mapping_parts = mapping.split(',')
     if len(mapping_parts) < 4:
-      _log_error(f"ERROR: mapping parts invalid. Could not set business hours key mappings for '{handler.Name}'")
+      _log_error(f"ERROR: mapping parts invalid format. Could not set business hours key mappings for '{handler.Name}'")
 
     transfer_to = None
     key = mapping_parts[0].strip()
@@ -95,7 +95,7 @@ def set_business_hours_keys_and_transfer_rules(handler:CallHandler, cn:CUCConnec
         handler_next_id = None
 
       if not handler_next_id:
-        _log_error(f"ERROR: error getting id of handler to transfer to for business hours key mapping on '{handler.Name}")
+        _log_error(f"ERROR: error getting id of handler to transfer to for business hours - key: {key}, mapping: {mapping_parts[3]} -- on '{handler.Name}")
       else:
         cn.set_dtmf_mapping(key, handler_next_id, handler, is_to_number=False)
 
@@ -113,7 +113,7 @@ def set_business_hours_keys_and_transfer_rules(handler:CallHandler, cn:CUCConnec
       if audio_file_path:
         cn.upload_greeting(audio_file_path, new_handler, 'Standard')
       else:
-        _log_error(f"ERROR: audio file {audio_file_path} not found")   
+        _log_error(f"ERROR: audio file {transfer_to} not found for '{new_handler.Name} Standard greeting on key: {key}'")   
 
       # set this call handler to map to the new handler
       cn.set_dtmf_mapping(key, new_handler.get_id(), handler, is_to_number=False)
@@ -178,7 +178,7 @@ def set_closed_greeting(handler:CallHandler, cn:CUCConnector, audio_path_name):
     cn.upload_greeting(audio_file_path, handler, 'Closed')
     cn.enable_closed(handler)
   else:
-    _log_error(f"ERROR: audio file {audio_file_path} not found")   
+    _log_error(f"ERROR: audio file {audio_path_name} not found for '{handler.Name}' Closed greeting")   
 
 """
 assumptions:
@@ -189,13 +189,12 @@ assumptions:
 """
 def create_new_after_hours_handler(handler:CallHandler, cn:CUCConnector, call_handlers):
 
-  # TODO testnewafter hours wrong input dtmf 
-
  # create the new handler
   name = remove_wav(handler.AfterHoursMainMenuCustomPromptFilename)
   new_handler = CallHandler()
   new_handler.Name = name
-  new_handler.BusinessHoursKeyMapping = handler.AfterHoursKeyMapping
+  new_handler.prefix = handler.prefix
+  new_handler.BusinessHoursKeyMapping= handler.AfterHoursKeyMapping
   if handler.OperatorExtension and handler.OperatorExtension not in INVALID_OPTIONS and not pd.isna(handler.OperatorExtension):
     new_handler.OperatorExtension = handler.OperatorExtension
 
@@ -272,6 +271,7 @@ def main():
   print("setting transfer rules...")
   print("uploading greetings...")
   print("setting access numbers (pilot identifiers)...\n") # error if dict changes size during iteration
+  print("setting after hours...")
   for k, handler in list(call_handlers.items()):
     try:
       handler: CallHandler
@@ -288,7 +288,7 @@ def main():
         if audio_file_path:
           cn.upload_greeting(audio_file_path, handler, 'Standard')
         else:
-          _log_error(f"ERROR: audio file {audio_file_path} not found")
+          _log_error(f"ERROR: audio file {target_filename} not found for '{handler.Name}' Standard greeting")
 
       elif handler.BusinessHoursWelcomeGreetingFilename and handler.BusinessHoursWelcomeGreetingFilename not in INVALID_OPTIONS and not pd.isna(handler.BusinessHoursWelcomeGreetingFilename):
         target_filename = handler.BusinessHoursWelcomeGreetingFilename.lower()
@@ -297,10 +297,13 @@ def main():
         if audio_file_path:
           cn.upload_greeting(audio_file_path, handler, 'Standard')
         else:
-          _log_error(f"ERROR: audio file {audio_file_path} not found")
+          _log_error(f"ERROR: audio file {target_filename} not found for '{handler.Name}' Standard greeting")
 
       # set access number
       if handler.PilotIdentifierList and handler.PilotIdentifierList not in INVALID_OPTIONS and not pd.isna(handler.PilotIdentifierList):
+        str_identifier = str(handler.PilotIdentifierList)
+        if len(str_identifier) < 9:
+          handler.PilotIdentifierList = int(get_full_number(str_identifier, handler))
         cn.set_dtmf_access_id(handler)
 
       # configure settings for after hours
