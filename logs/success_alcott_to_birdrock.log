@@ -1,0 +1,84 @@
+Successful function calls:
+'023-UMAA-03-Main_English_Night' created: /vmrest/handlers/callhandlers/3f1f8e38-b8a2-49a8-9c00-ddc8d7efc93c
+'023-UMAA-04-Main_Spanish_Night' created: /vmrest/handlers/callhandlers/1a9f5d86-879e-4bf9-be41-a54b0a264114
+'023-UMAA-02-Main_Spanish' created: /vmrest/handlers/callhandlers/cd7b1a6c-8dd9-470f-b5a6-6c7e70329ae7
+'023-UMAA-01-Main-English' created: /vmrest/handlers/callhandlers/8493bb91-66be-46bd-b9c6-24b661027dd8
+'004-UMAA-01-Main_English' created: /vmrest/handlers/callhandlers/472d9001-553b-4b44-9a0d-dbfcb901c259
+'004-UMAA-01-Main_Spanish' created: /vmrest/handlers/callhandlers/c801a210-d1e4-4b35-82b5-75dee94ceca8
+'004-Sub Tree English' created: /vmrest/handlers/callhandlers/b59a4977-0e61-49fa-9138-2b8a3d927b6e
+'021-UMAA-01-Main_English' created: /vmrest/handlers/callhandlers/5521b385-a4a7-450b-84c9-c23bf6d3d061
+'021-UMAA-01-Main_Spanish' created: /vmrest/handlers/callhandlers/f1af7f52-0a03-4c9a-b940-d8d2d1068f76
+'029-UMAA-01-Main_Spanish' created: /vmrest/handlers/callhandlers/700401a1-dbd4-4108-b8ef-14afdc41b880
+'029-UMAA-01-Main_English' created: /vmrest/handlers/callhandlers/b60d4dd6-3234-4e9c-8c5d-9b3ac3332248
+'023-UMAA-03-Main_English_Night' set with key: 1 and mapping: 1a9f5d86-879e-4bf9-be41-a54b0a264114
+'023-UMAA-03-Main_English_Night' set with key: 2 and mapping: 800233011
+'023-UMAA-03-Main_English_Night' set with key: 3 and mapping: 800233050
+'023-UMAA-03-Main_English_Night' transfer rule set
+'023-UMAA-03-Main_English_Night' after greeting action set
+'023-UMAA-04-Main_Spanish_Night' set with key: 2 and mapping: 800233011
+'023-UMAA-04-Main_Spanish_Night' set with key: 3 and mapping: 800233050
+'023-UMAA-04-Main_Spanish_Night' transfer rule set
+'023-UMAA-04-Main_Spanish_Night' after greeting action set
+'023-UMAA-04-Main_Spanish_Night' greeting uploaded for Standard
+'023-UMAA-02-Main_Spanish' set with key: 2 and mapping: 800233011
+'023-UMAA-02-Main_Spanish' set with key: 3 and mapping: 800233050
+'023-UMAA-02-Main_Spanish' transfer rule set
+'023-UMAA-02-Main_Spanish' after greeting action set
+'023-UMAA-02-Main_Spanish' greeting uploaded for Standard
+'023-UMAA-02-Main_Spanish' closed handler set
+'023-UMAA-01-Main-English' set with key: 1 and mapping: 800233011
+'023-UMAA-01-Main-English' transfer rule set
+'023-UMAA-01-Main-English' after greeting action set
+'023-UMAA-01-Main-English' greeting uploaded for Standard
+023-UMAA-01-Main-English DTMFAccessId set with 800233000
+'004-UMAA-01-Main_English' set with key: 0 and mapping: 800043021
+'004-UMAA-01-Main_English' set with key: 1 and mapping: 800043021
+'004-UMAA-01-Main_English' set with key: 2 and mapping: 800043021
+'004-UMAA-01-Main_English' set with key: 3 and mapping: 800043020
+'004-UMAA-01-Main_English' set with key: 4 and mapping: 800043023
+'004-UMAA-01-Main_English' set with key: 5 and mapping: b59a4977-0e61-49fa-9138-2b8a3d927b6e
+'004-UMAA-01-Main_English' set with key: 6 and mapping: 800043071
+'004-UMAA-01-Main_English' transfer rule set
+'004-UMAA-01-Main_English' after greeting action set
+'004-UMAA-01-Main_English' greeting uploaded for Standard
+004-UMAA-01-Main_English DTMFAccessId set with 800043000
+'004-UMAA-01-Main_Spanish' set with key: 0 and mapping: 800043021
+'004-UMAA-01-Main_Spanish' transfer rule set
+'004-UMAA-01-Main_Spanish' after greeting action set
+'004-Sub Tree English' set with key: 0 and mapping: 800043021
+'004-Sub Tree English' set with key: 1 and mapping: 800043063
+'004-Sub Tree English' set with key: 2 and mapping: 800043064
+'004-Sub Tree English' set with key: 3 and mapping: 800043045
+'004-Sub Tree English' transfer rule set
+'004-Sub Tree English' after greeting action set
+'004-Sub Tree English' greeting uploaded for Standard
+'021-UMAA-01-Main_English' set with key: 0 and mapping: 800213021
+'021-UMAA-01-Main_English' set with key: 2 and mapping: 800213021
+'021-UMAA-01-Main_English' set with key: 3 and mapping: 800213050
+'021-UMAA-01-Main_English' set with key: 4 and mapping: 800213062
+'021-UMAA-01-Main_English' set with key: 5 and mapping: 800213060
+'021-UMAA-01-Main_English' set with key: 6 and mapping: 800213020
+'021-UMAA-01-Main_English' transfer rule set
+'021-UMAA-01-Main_English' after greeting action set
+'021-UMAA-01-Main_English' greeting uploaded for Standard
+021-UMAA-01-Main_English DTMFAccessId set with 800213000
+'021-UMAA-01-Main_Spanish' set with key: 0 and mapping: 800213021
+'021-UMAA-01-Main_Spanish' set with key: 2 and mapping: 800213021
+'021-UMAA-01-Main_Spanish' set with key: 3 and mapping: 800213050
+'021-UMAA-01-Main_Spanish' set with key: 4 and mapping: 800213062
+'021-UMAA-01-Main_Spanish' set with key: 5 and mapping: 800213060
+'021-UMAA-01-Main_Spanish' set with key: 6 and mapping: 800213020
+'021-UMAA-01-Main_Spanish' transfer rule set
+'021-UMAA-01-Main_Spanish' after greeting action set
+'029-UMAA-01-Main_Spanish' set with key: 0 and mapping: 800293021
+'029-UMAA-01-Main_Spanish' transfer rule set
+'029-UMAA-01-Main_Spanish' after greeting action set
+'029-UMAA-01-Main_English' set with key: 0 and mapping: 800293020
+'029-UMAA-01-Main_English' set with key: 2 and mapping: 800293020
+'029-UMAA-01-Main_English' set with key: 3 and mapping: 800293065
+'029-UMAA-01-Main_English' set with key: 4 and mapping: 800293050
+'029-UMAA-01-Main_English' set with key: 5 and mapping: 800293021
+'029-UMAA-01-Main_English' transfer rule set
+'029-UMAA-01-Main_English' after greeting action set
+'029-UMAA-01-Main_English' greeting uploaded for Standard
+029-UMAA-01-Main_English DTMFAccessId set with 800293000
