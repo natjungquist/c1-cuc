@@ -10,7 +10,7 @@ import os
 import sys
 from util import _log_to_file
 
-INVALID_OPTIONS = ["0", 0, "silence.wav", "silence2.wav", '']
+INVALID_OPTIONS = ["0", 0, "silence.wav", "silence2.wav", '', "Blank.wav"]
 
 """
 finds the specific business hours wav file 
