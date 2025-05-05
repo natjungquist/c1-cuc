@@ -1202,3 +1202,53 @@ Successful function calls:
 '297-UMAA-01-Main_English' transfer rule set
 '297-UMAA-01-Main_English' after greeting action set
 297-UMAA-01-Main_English DTMFAccessId set with 802973000
+'342 Departments Sub Menu English' created: /vmrest/handlers/callhandlers/bead1fc3-ea51-47b0-a789-4511bb3099d4
+'342 Departments Sub Menu Spanish' created: /vmrest/handlers/callhandlers/c73788a3-fd99-4f19-87e6-125810d4eca7
+'342 Departments Sub Sub Spanish' created: /vmrest/handlers/callhandlers/3d3d0ad6-a0d6-4748-81ac-d2985daa4c89
+'342 Departments Sub Sub English' created: /vmrest/handlers/callhandlers/66b3cbf8-4d04-489c-81e7-9df1a8ed111a
+'342 Admin Sub Menu English' created: /vmrest/handlers/callhandlers/5ac50eda-f178-4e2c-b8cd-5da137dabc1f
+'342 Admin Sub Menu Spanish' created: /vmrest/handlers/callhandlers/a8e5372e-56dd-471f-9c1a-fdb0354249e6
+'342 Departments Sub Menu English' set with key: 0 and mapping: 803423021
+'342 Departments Sub Menu English' set with key: 1 and mapping: 803423024
+'342 Departments Sub Menu English' set with key: 2 and mapping: 803423050
+'342 Departments Sub Menu English' set with key: 3 and mapping: 803423057
+'342 Departments Sub Menu English' set with key: 4 and mapping: 803423067
+'342 Departments Sub Menu English' set with key: 5 and mapping: 803423026
+'342 Departments Sub Menu English' transfer rule set
+'342 Departments Sub Menu English' after greeting action set
+'342 Departments Sub Menu English' greeting uploaded for Standard
+'342 Departments Sub Menu Spanish' set with key: 0 and mapping: 803423021
+'342 Departments Sub Menu Spanish' set with key: 1 and mapping: 803423024
+'342 Departments Sub Menu Spanish' set with key: 2 and mapping: 803423050
+'342 Departments Sub Menu Spanish' set with key: 3 and mapping: 803423057
+'342 Departments Sub Menu Spanish' set with key: 4 and mapping: 803423067
+'342 Departments Sub Menu Spanish' set with key: 5 and mapping: 803423026
+'342 Departments Sub Menu Spanish' transfer rule set
+'342 Departments Sub Menu Spanish' after greeting action set
+'342 Departments Sub Menu Spanish' greeting uploaded for Standard
+'342 Departments Sub Sub Spanish' set with key: 1 and mapping: 803423003
+'342 Departments Sub Sub Spanish' set with key: 2 and mapping: 803423002
+'342 Departments Sub Sub Spanish' set with key: 3 and mapping: 803423020
+'342 Departments Sub Sub Spanish' after greeting action set
+'342 Departments Sub Sub Spanish' greeting uploaded for Standard
+'342 Departments Sub Sub English' set with key: 0 and mapping: 803423021
+'342 Departments Sub Sub English' set with key: 1 and mapping: 803423003
+'342 Departments Sub Sub English' set with key: 2 and mapping: 803423002
+'342 Departments Sub Sub English' set with key: 3 and mapping: 803423020
+'342 Departments Sub Sub English' transfer rule set
+'342 Departments Sub Sub English' after greeting action set
+'342 Departments Sub Sub English' greeting uploaded for Standard
+'342 Admin Sub Menu English' set with key: 0 and mapping: 803423021
+'342 Admin Sub Menu English' set with key: 1 and mapping: 803423003
+'342 Admin Sub Menu English' set with key: 2 and mapping: 803423002
+'342 Admin Sub Menu English' set with key: 9 and mapping: 803423020
+'342 Admin Sub Menu English' transfer rule set
+'342 Admin Sub Menu English' after greeting action set
+'342 Admin Sub Menu English' greeting uploaded for Standard
+'342 Admin Sub Menu Spanish' set with key: 0 and mapping: 803423021
+'342 Admin Sub Menu Spanish' set with key: 1 and mapping: 803423003
+'342 Admin Sub Menu Spanish' set with key: 2 and mapping: 803423002
+'342 Admin Sub Menu Spanish' set with key: 9 and mapping: 803423020
+'342 Admin Sub Menu Spanish' transfer rule set
+'342 Admin Sub Menu Spanish' after greeting action set
+'342 Admin Sub Menu Spanish' greeting uploaded for Standard

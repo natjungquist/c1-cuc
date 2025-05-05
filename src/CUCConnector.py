@@ -223,7 +223,7 @@ class CUCConnector:
         ) 
 
         if response.status_code == 204: 
-            _log_success(f"{handler.Name} DTMFAccessId set with {handler.PilotIdentifierList}")
+            _log_success(f"'{handler.Name}' DTMFAccessId set with {handler.PilotIdentifierList}")
         elif response.status_code == 400 and "Duplicate" in response.text:
             _log_error(f"ERROR: '{handler.Name}' DTMF access ID not set because another handler is already assigned to it.")
         else:

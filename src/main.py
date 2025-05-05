@@ -92,6 +92,12 @@ def set_business_hours_keys_and_transfer_rules(handler:CallHandler, cn:CUCConnec
 
     # option 2. go to another call handler that already exists
     elif (mapping_parts[3] not in INVALID_OPTIONS):
+
+      # TODO HANDLE if key = - and goes to another handler, not a number
+      if key == '-':
+        has_dash = True
+        pass
+
       transfer_to = mapping_parts[3]
 
       handler_next = call_handlers.get(transfer_to)
@@ -101,7 +107,7 @@ def set_business_hours_keys_and_transfer_rules(handler:CallHandler, cn:CUCConnec
         handler_next_id = None
 
       if not handler_next_id:
-        _log_error(f"ERROR: error getting id of handler to transfer to for business hours - key: {key}, mapping: {mapping_parts[3]} -- on '{handler.Name}")
+        _log_error(f"ERROR: error getting id of handler to transfer to for business hours - key: {key}, mapping: '{mapping_parts[3]}' -- on '{handler.Name}'")
       else:
         cn.set_dtmf_mapping(key, handler_next_id, handler, is_to_number=False)
 
