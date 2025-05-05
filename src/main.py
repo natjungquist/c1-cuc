@@ -55,7 +55,9 @@ def set_business_hours_keys_and_transfer_rules(handler:CallHandler, cn:CUCConnec
   # operator mapping
   if handler.OperatorExtension and handler.OperatorExtension not in INVALID_OPTIONS and not pd.isna(handler.OperatorExtension):
     operator_string = str(handler.OperatorExtension)
-    if len(operator_string) < 9:
+    if len(operator_string) == 9:
+      cn.set_dtmf_mapping("0", operator_string, handler, is_to_number=True)
+    elif len(operator_string) < 9:
       operator_final = get_full_number(operator_string, handler)
       if len(operator_final) == 9:
         cn.set_dtmf_mapping("0", operator_final, handler, is_to_number=True)
@@ -93,23 +95,22 @@ def set_business_hours_keys_and_transfer_rules(handler:CallHandler, cn:CUCConnec
     # option 2. go to another call handler that already exists
     elif (mapping_parts[3] not in INVALID_OPTIONS):
 
-      # TODO HANDLE if key = - and goes to another handler, not a number
       if key == '-':
         has_dash = True
-        pass
-
-      transfer_to = mapping_parts[3]
-
-      handler_next = call_handlers.get(transfer_to)
-      if handler_next:
-        handler_next_id = handler_next.get_id()
+        _log_error(f"ERROR: '{handler.Name}' has a key mapping for '-' that goes to another call handler, but setting this transfer rule is not possible.")
       else:
-        handler_next_id = None
+        transfer_to = mapping_parts[3]
 
-      if not handler_next_id:
-        _log_error(f"ERROR: error getting id of handler to transfer to for business hours - key: {key}, mapping: '{mapping_parts[3]}' -- on '{handler.Name}'")
-      else:
-        cn.set_dtmf_mapping(key, handler_next_id, handler, is_to_number=False)
+        handler_next = call_handlers.get(transfer_to)
+        if handler_next:
+          handler_next_id = handler_next.get_id()
+        else:
+          handler_next_id = None
+
+        if not handler_next_id:
+          _log_error(f"ERROR: error getting id of handler to transfer to for business hours - key: {key}, mapping: '{mapping_parts[3]}' -- on '{handler.Name}'")
+        else:
+          cn.set_dtmf_mapping(key, handler_next_id, handler, is_to_number=False)
 
    # option 3. create a new call handler to go to
     elif (mapping_parts[4] not in INVALID_OPTIONS): # go to a wav file
@@ -133,8 +134,17 @@ def set_business_hours_keys_and_transfer_rules(handler:CallHandler, cn:CUCConnec
   # set the transfer rule to the OperatorExtension if there was not already one specified
   if not has_dash:
     if handler.OperatorExtension and handler.OperatorExtension not in INVALID_OPTIONS:
-      handler.set_transfer_rule_extension(handler.OperatorExtension)
-      cn.set_standard_transfer_rule_to_extension(handler)
+      operator_string = str(handler.OperatorExtension)
+      if len(operator_string) == 9:
+        handler.set_transfer_rule_extension(handler.OperatorExtension)
+        cn.set_standard_transfer_rule_to_extension(handler)
+      elif len(operator_string) < 9:
+        operator_final = get_full_number(operator_string, handler)
+        if len(operator_final) == 9:
+          handler.set_transfer_rule_extension(handler.OperatorExtension)
+          cn.set_standard_transfer_rule_to_extension(handler)
+        else:
+          _log_error(f"ERROR: could not set transfer rule on handler '{handler.Name}' using operator extension due to error parsing 9 digit number.")
 
 
 """
