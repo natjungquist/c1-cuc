@@ -90,7 +90,7 @@ def set_business_hours_keys_and_transfer_rules(handler:CallHandler, cn:CUCConnec
         else: #not a dash, set mapping
           cn.set_dtmf_mapping(key, transfer_to, handler, is_to_number=True)
       else:
-        _log_error(f"ERROR: could not make 9-digit key mapping for handler '{handler.Name}'")
+        _log_error(f"ERROR: could not make 9-digit key mapping for handler '{handler.Name}'. Please manually fix the caller input for this handler in CUC.")
 
     # option 2. go to another call handler that already exists
     elif (mapping_parts[3] not in INVALID_OPTIONS):
@@ -235,17 +235,27 @@ def test():
   with open('config.json') as config_file:
     config = json.load(config_file)
 
-  SERVER = config["server"]
-  USERNAME = config["username"]
-  PASSWORD = config["password"]
-  cn = CUCConnector(SERVER, USERNAME, PASSWORD)
-  cn.get_template_id()
+  FILE = config["autoAttendantsFile"]
 
-  test_handler_id = "c89f4758-db2f-44fc-bcf3-08fc102d5db9"
-  test = CallHandler()
-  test.UnityId = test_handler_id
+  call_handlers = {}
 
-  cn.set_standard_after_greeting_action(test)
+  df = pd.read_csv(FILE)
+
+  for index, row in df.iterrows():
+      handler = CallHandler(row)
+      call_handlers[handler.Name] = handler # add it to the dictionary of all handlers
+  
+  for k, handler in list(call_handlers.items()):
+    try:
+      handler: CallHandler
+
+      # find which handlers have two files for greeting
+      if handler.BusinessHoursMainMenuCustomPromptFilename and handler.BusinessHoursMainMenuCustomPromptFilename not in INVALID_OPTIONS and not pd.isna(handler.BusinessHoursMainMenuCustomPromptFilename) and handler.BusinessHoursWelcomeGreetingFilename and handler.BusinessHoursWelcomeGreetingFilename not in INVALID_OPTIONS and not pd.isna(handler.BusinessHoursWelcomeGreetingFilename):
+        print(f"'{handler.Name}' had two files specified for greeting but only the one under 'BusinessHoursMainMenuCustomPromptFilename' was uploaded. '{handler.BusinessHoursMainMenuCustomPromptFilename}' was uploaded but '{handler.BusinessHoursWelcomeGreetingFilename}' was not.")
+
+    except Exception as e:
+      print(f"Unexpected error while processing handler '{handler.Name}': {e}")
+      continue
 
 
 
@@ -366,5 +376,5 @@ main program execution.
 if __name__ == "__main__":
   init_logs()
   print("starting program...")
-  main()
+  test()
   print("done.")
