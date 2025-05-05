@@ -159,7 +159,7 @@ class CUCConnector:
         )
 
         if response.status_code == 204: 
-            _log_success(f"'{handler.Name}' transfer rule set")
+            _log_success(f"'{handler.Name}' transfer rule set to {handler.transfer_rule_extension}")
         else:
             _log_error(f"ERROR: failed to set transfer rule for handler '{handler.Name}': {response.status_code} - {response.text}")
 

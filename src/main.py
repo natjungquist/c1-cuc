@@ -345,6 +345,8 @@ def main():
       elif handler.AfterHoursWelcomeGreetingFilename and handler.AfterHoursWelcomeGreetingFilename not in INVALID_OPTIONS and handler.AfterHoursMainMenuCustomPromptFilename and handler.AfterHoursMainMenuCustomPromptFilename not in INVALID_OPTIONS:
         _log_error(f"'{handler.Name}' after hours not configured: two recordings need to be concatenated.")
 
+      print(f"created {len(call_handlers)} call handlers.")
+
     except Exception as e:
       _log_error(f"Unexpected error while processing handler '{handler.Name}': {e}")
       continue
