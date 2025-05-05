@@ -1,0 +1,11 @@
+Program errors (must fix these handlers manually):
+ERROR: '279-UMAA-01-Main_English' has a key mapping for '-' that goes to another call handler, but setting this transfer rule is not possible.
+ERROR: audio file 307-umaa-01-english_main.wav not found for '307-UMAA-03-Main_English_Night' Standard greeting
+'316-UMAA-06-PE_Spanish' after hours not configured: two recordings need to be concatenated.
+'316-UMAA-02-Main_Spanish' after hours not configured: two recordings need to be concatenated.
+'316-UMAA-05-Admin_Spanish' after hours not configured: two recordings need to be concatenated.
+'316-UMAA-03-Admin_English' after hours not configured: two recordings need to be concatenated.
+'316-UMAA-04-PE_English' after hours not configured: two recordings need to be concatenated.
+ERROR: audio file counselor greeting spanish.wav not found for '350-MissionBayHS-Spanish-part2' Standard greeting
+ERROR: failed to set dtmf for handler '354-UMAA-01-Main_Spanish' with key: - and mapping: 9cc11c25-6ade-418a-a376-7dd90d20542d: 400 - <?xml version="1.0" encoding="UTF-8" standalone="yes"?><ErrorDetails><errors><code>DATA_EXCEPTION</code><message>MenuEntry not found </message></errors></ErrorDetails>
+ERROR: '087-UMAA-02-Break-English' has a key mapping for '-' that goes to another call handler, but setting this transfer rule is not possible.

@@ -140,6 +140,9 @@ class CUCConnector:
         if not handler.transfer_rule_extension:
             _log_error(f"ERROR: cannot set standard transfer rule for '{handler.Name}' because extension is not defined.")
             return
+        if len(str(handler.transfer_rule_extension)) != 9:
+            _log_error(f"ERROR: transfer rule extension {handler.transfer_rule_extension} is not 9 digits for '{handler.Name}'")
+            return
 
         url = f"https://{self.server}/vmrest/handlers/callhandlers/{handler.get_id()}/transferoptions/Standard"
 

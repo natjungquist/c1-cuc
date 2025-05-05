@@ -136,12 +136,12 @@ def set_business_hours_keys_and_transfer_rules(handler:CallHandler, cn:CUCConnec
     if handler.OperatorExtension and handler.OperatorExtension not in INVALID_OPTIONS:
       operator_string = str(handler.OperatorExtension)
       if len(operator_string) == 9:
-        handler.set_transfer_rule_extension(handler.OperatorExtension)
+        handler.set_transfer_rule_extension(operator_string)
         cn.set_standard_transfer_rule_to_extension(handler)
       elif len(operator_string) < 9:
         operator_final = get_full_number(operator_string, handler)
         if len(operator_final) == 9:
-          handler.set_transfer_rule_extension(handler.OperatorExtension)
+          handler.set_transfer_rule_extension(operator_final)
           cn.set_standard_transfer_rule_to_extension(handler)
         else:
           _log_error(f"ERROR: could not set transfer rule on handler '{handler.Name}' using operator extension due to error parsing 9 digit number.")
@@ -345,11 +345,11 @@ def main():
       elif handler.AfterHoursWelcomeGreetingFilename and handler.AfterHoursWelcomeGreetingFilename not in INVALID_OPTIONS and handler.AfterHoursMainMenuCustomPromptFilename and handler.AfterHoursMainMenuCustomPromptFilename not in INVALID_OPTIONS:
         _log_error(f"'{handler.Name}' after hours not configured: two recordings need to be concatenated.")
 
-      print(f"created {len(call_handlers)} call handlers.")
-
     except Exception as e:
       _log_error(f"Unexpected error while processing handler '{handler.Name}': {e}")
       continue
+
+  print(f"created {len(call_handlers)} call handlers.")
 
 
   
